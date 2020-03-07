@@ -117,7 +117,7 @@ namespace Arp
                 }
 
 
-                Console.WriteLine("  Internet Address      Physical Address      Type");
+                Console.WriteLine("\n  Internet Address      Physical Address      Type");
 
                 for (int index = 0; index < entries; index++)
                 {

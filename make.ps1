@@ -13,6 +13,12 @@ C:\Windows\Microsoft.NET\Framework\v2.0.50727\csc.exe /t:exe /out:bin\env.exe en
 Write-Output "  [*] freespace.exe"
 C:\Windows\Microsoft.NET\Framework\v2.0.50727\csc.exe /t:exe /out:bin\freespace.exe freespace.cs | Out-Null
 
+Write-Output "  [*] get-hotfix.exe"
+C:\Windows\Microsoft.NET\Framework\v3.5\csc.exe /t:exe /out:bin\get-hotfix.exe get-hotfix.cs | Out-Null
+
+Write-Output "  [*] lld.exe"
+C:\Windows\Microsoft.NET\Framework\v3.5\csc.exe /t:exe /out:bin\lld.exe lld.cs | Out-Null
+
 Write-Output "  [*] pagegrab.exe"
 C:\Windows\Microsoft.NET\Framework\v2.0.50727\csc.exe /t:exe /out:bin\pagegrab.exe pagegrab.cs | Out-Null
 
