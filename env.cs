@@ -1,7 +1,8 @@
 // Source: https://docs.microsoft.com/en-us/dotnet/api/system.environment.getenvironmentvariables?view=netframework-4.8
 // Added sorting to match the output of the native Windows "set"
 
-// C:\Windows\Microsoft.NET\Framework\v4.0.30319\csc.exe /t:exe /out:env.exe env.cs
+// To Compile:
+//   C:\Windows\Microsoft.NET\Framework\v2.0.50727\csc.exe /t:exe /out:env.exe env.cs
 
 using System;
 using System.Collections;

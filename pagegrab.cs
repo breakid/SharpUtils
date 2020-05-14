@@ -7,7 +7,8 @@
  *   pagegrab.exe -m post https://postman-echo.com/post -d query=test -v -p http://127.0.0.1:8000
  */
 
-// C:\Windows\Microsoft.NET\Framework\v4.0.30319\csc.exe /t:exe /out:test\pagegrab.exe pagegrab.cs
+// To Compile:
+//   C:\Windows\Microsoft.NET\Framework\v2.0.50727\csc.exe /t:exe /out:pagegrab.exe pagegrab.cs
 
 using System;
 using System.IO;

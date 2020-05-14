@@ -1,7 +1,8 @@
 // Source: https://stackoverflow.com/questions/1148778/how-do-i-access-arp-protocol-information-through-net
 // Modified to more closely match the formatting of native arp
 
-// C:\Windows\Microsoft.NET\Framework\v4.0.30319\csc.exe /t:exe /out:arp.exe arp.cs
+// To Compile:
+//   C:\Windows\Microsoft.NET\Framework\v2.0.50727\csc.exe /t:exe /out:arp.exe arp.cs
 
 using System;
 using System.Runtime.InteropServices;

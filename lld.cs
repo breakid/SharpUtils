@@ -1,6 +1,7 @@
 // Source: https://stackoverflow.com/questions/14442960/getting-drive-info-from-a-remote-computer
 
-// C:\Windows\Microsoft.NET\Framework\v3.5\csc.exe /t:exe /out:bin\lld.exe
+// To Compile:
+//   C:\Windows\Microsoft.NET\Framework\v3.5\csc.exe /t:exe /out:bin\lld.exe
 
 using System;
 using System.Management;

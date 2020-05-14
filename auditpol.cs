@@ -1,6 +1,7 @@
 // Source: https://david-homer.blogspot.com/2016/08/document-windows-advanced-audit-policy.html
 
-// C:\Windows\Microsoft.NET\Framework\v4.0.30319\csc.exe /t:exe /out:auditpol.exe auditpol.cs
+// To Compile:
+//   C:\Windows\Microsoft.NET\Framework\v2.0.50727\csc.exe /t:exe /out:auditpol.exe auditpol.cs
 
 using System;
 using System.Collections.Specialized;

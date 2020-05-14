@@ -1,6 +1,7 @@
 // Source: https://docs.microsoft.com/en-us/dotnet/api/system.io.driveinfo.availablefreespace
 
-// C:\Windows\Microsoft.NET\Framework\v4.0.30319\csc.exe /t:exe /out:bin\freespace.exe freespace.cs
+// To Compile:
+//   C:\Windows\Microsoft.NET\Framework\v2.0.50727\csc.exe /t:exe /out:freespace.exe freespace.cs
 
 using System;
 using System.IO;

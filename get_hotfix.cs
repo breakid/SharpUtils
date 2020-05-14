@@ -1,4 +1,5 @@
-// C:\Windows\Microsoft.NET\Framework\v3.5\csc.exe /t:exe /out:bin\get-hotfix.exe get-hotfix.cs
+// To Compile:
+//   C:\Windows\Microsoft.NET\Framework\v3.5\csc.exe /t:exe /out:get_hotfix.exe get_hotfix.cs
 
 using System;
 using System.Management;
