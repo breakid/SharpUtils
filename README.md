@@ -33,9 +33,9 @@ Displays the computer's auditing policy (i.e., what actions will be logged)
 
 
 ### create_process.exe
-
 Uses WMI to execute a command on the specified remote host
 
+**Uses WMI**
 **Requires administrative privileges on the remote host**
 
 #### Usage
@@ -52,10 +52,10 @@ Displays environment variables (in alphabetical order)
 
 
 ### eventlog.exe
-Displays environment variables (in alphabetical order)
+Reads events from the specified log file; optionally limit by EventID and number of events returned
 
 #### Usage
-    eventlog.exe
+    eventlog.exe <log name> [/C <count>] [/E <event IDs (comma-separated, no space)>]
 
 
 
@@ -94,6 +94,9 @@ Displays permissions, grouped by user/group, for each file or directory specifie
 ### lld.exe
 Lists logical drives (using WMI), including total and available free space. Mapped drives will only be shown when lld.exe is run within the same session or with the same credentials used to map the drive. This differs from freespace.exe because it can be used against a remote system.
 
+**Uses WMI**
+**Requires administrative privileges when used against a remote host**
+
 #### Usage
     lld.exe [system]
 
@@ -119,7 +122,7 @@ Read the contents of a file; optionally limit to X number of lines from the begi
 
 
 ### taskkill.exe
-Kills a single process by PID, or one or more processes by imagename.
+Kills a single process by PID, or one or more processes by imagename. Optionally, target a remote host and/or provide plaintext username and password from the command-line.
 
 **Uses WMI**
 **Requires administrative privileges if used on a remote host and for some local tasks (i.e., killing processes with a different owner)**
@@ -132,7 +135,7 @@ Kills a single process by PID, or one or more processes by imagename.
 ### test_ad_creds.exe
 Authenticates against the specified Active Directory (AD) domain using the provided username and password; indicates whether the credentials are valid or not. Does not work with local credentials, only AD creds.
 
-** This WILL create a failed logon event if the credentials are not valid; use sparingly to avoid account lockout**
+**This WILL create a failed logon event if the credentials are not valid; use sparingly to avoid account lockout**
 
 #### Usage
     test_ad_creds.exe <domain> <username> <password>
@@ -155,7 +158,6 @@ Much of this code is derived from online examples. Where applicable, sources are
 ---
 
 # Other Resources
-
 Below is a list of other utilities that I have collected (though not personally tested) that may be of interest.
 
 * [Covenant](https://github.com/cobbr/Covenant "Covenant") - a collaborative .NET C2 framework for red teamers
