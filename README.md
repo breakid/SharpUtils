@@ -36,10 +36,27 @@ Displays the computer's auditing policy (i.e., what actions will be logged)
 Uses WMI to execute a command on the specified remote host
 
 **Uses WMI**
+
 **Requires administrative privileges on the remote host**
 
 #### Usage
     create_process.exe <host> <full_path_to_exe_on_remote_host> <executable_arguments>
+
+
+
+### dump_dns.exe
+Uses Active Directory Search Interface (ADSI) to dump DNS data from Active Directory. If the DNS records cannot be parsed, it will fallback to performing DNS requests for individual hostnames.
+
+It can be run with no arguments from a domain-joined host with normal user credentials. If running from a non-domain-joined host, use the "/s" option to specify a server to query. The "/d" and "/f" options can be used to specify specific domains and forests to dump.
+
+Users can optionally specify an output file using "/o"; if omitted, output will be written to STDOUT.
+
+Since it queries Active Directory, it may need to be run using domain user credentials (non-privileged will suffice). If necessary and missing, a "[-] ERROR: The user name or password is incorrect." message will be displayed.
+
+#### Usage
+    dump_dns.exe [/S <dns_server>] [/D <domain_name>] [/F <forest_name>] [/T] [/O <output_filepath>]
+    
+    /T    Optionally include tombstoned values
 
 
 
@@ -168,6 +185,7 @@ Below is a list of other utilities that I have collected (though not personally 
 * [SharpClipHistory](https://github.com/FSecureLABS/SharpClipHistory "SharpClipHistory") - a .NET application written in C# that can be used to read the contents of a user's clipboard history in Windows 10
 * [SharpGPOAbuse](https://github.com/FSecureLABS/SharpGPOAbuse "SharpGPOAbuse") - a .NET application written in C# that can be used to take advantage of a user's edit rights on a Group Policy Object (GPO) in order to compromise the objects that are controlled by that GPO.
 * [SharpGPO-RemoteAccessPolicies](https://github.com/FSecureLABS/SharpGPO-RemoteAccessPolicies "SharpGPO-RemoteAccessPolicies") - a C# tool for enumerating remote access policies through group policy
+* [SharpRDPCheck](https://github.com/3gstudent/SharpRDPCheck "SharpRDPCheck") and [SharpRDPUploader](https://github.com/RDPUploader/RDPUploader "SharpRDPUploader") - tools for exploiting RDP
 * [autorunner](https://github.com/woanware/autorunner "autorunner") - emulates the Sysinternals Autoruns tool, using C# / .NET
 * [taskscheduler](https://github.com/dahall/taskscheduler "taskscheduler") - provides a .NET wrapper for the Windows Task Scheduler
 * .NET Binary Obfuscator / Packer
