@@ -13,7 +13,7 @@ Write-Output "  [*] create_process.exe"
 C:\Windows\Microsoft.NET\Framework\v3.5\csc.exe /t:exe /out:bin\create_process.exe create_process.cs > $null
 
 Write-Output "  [*] dump_dns.exe"
-C:\Windows\Microsoft.NET\Framework\v4.0.30319\csc.exe /t:exe /out:bin\dump_dns.exe dump_dns.cs #> $null
+C:\Windows\Microsoft.NET\Framework\v4.0.30319\csc.exe /t:exe /out:bin\dump_dns.exe dump_dns.cs > $null
 
 Write-Output "  [*] env.exe"
 C:\Windows\Microsoft.NET\Framework\v2.0.50727\csc.exe /t:exe /out:bin\env.exe env.cs > $null
