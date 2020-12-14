@@ -44,6 +44,16 @@ Uses WMI to execute a command on the specified remote host
 
 
 
+### driver_list.exe
+Displays info about installed drivers. Name and signer are displayed by default; normal verbose flag (/V) adds version number and DeviceID, and the very verbose flag (/VV) lists all driver properties.
+
+**Uses WMI**
+
+#### Usage
+    driver_list.exe [/V | /VV]
+
+
+
 ### dump_dns.exe
 Uses Active Directory Search Interface (ADSI) to dump DNS data from Active Directory. If the DNS records cannot be parsed, it will fallback to performing DNS requests for individual hostnames.
 
@@ -73,6 +83,14 @@ Reads events from the specified log file; optionally limit by EventID and number
 
 #### Usage
     eventlog.exe <log name> [/C <count>] [/E <event IDs (comma-separated, no space)>]
+
+
+
+### farm_dns.exe
+Performs reverse DNS lookups on the specified range of IP addresses (IPv4 only). Opted to remove the output file support from the original design because all data was written at the end; if a user choose to end the farming early all data would be lost. Writing to STDOUT in real-time allows a user to end the farming and resume later with the IP address where they left off without losing any data.
+
+#### Usage
+    farm_dns.exe <start_IP> <end_IP>
 
 
 
@@ -166,6 +184,16 @@ Displays a list of visible windows and their associated process.
 
 #### Usage
     window_list.exe [/S <host>]
+
+
+
+### wmi_query.exe
+Runs the specified WMI query and displays properties in key-value pairs. The query string must be in quotes.
+
+**Uses WMI** (...obviously)
+
+#### Usage
+    wmi_query.exe [/V] [/O <output_filepath>] "<wmi_query>"
 
 ---
 

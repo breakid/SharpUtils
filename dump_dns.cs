@@ -100,6 +100,14 @@ namespace DumpDNS
                     case "/O":
                         i++;
                         outputFilepath = args[i];
+                        
+                        if (File.Exists(outputFilepath))
+                        {
+                            Console.WriteLine("[-] ERROR: Output file exists");
+                            Console.WriteLine("\nDONE");
+                            return;
+                        }
+                        
                         break;
                     case "/?":
                         PrintUsage();
@@ -484,7 +492,16 @@ namespace DumpDNS
             {
                 if (!File.Exists(outputFilepath))
                 {
-                    System.IO.File.WriteAllLines(outputFilepath, output);
+                    Console.WriteLine("[*] Writing output to: {0}", outputFilepath);
+                    
+                    try
+                    {
+                        System.IO.File.WriteAllLines(outputFilepath, output);
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine("[-] ERROR: {0}", e.Message));
+                    }
                 }
                 else
                 {

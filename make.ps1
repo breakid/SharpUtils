@@ -12,6 +12,9 @@ C:\Windows\Microsoft.NET\Framework\v2.0.50727\csc.exe /t:exe /out:bin\auditpol.e
 Write-Output "  [*] create_process.exe"
 C:\Windows\Microsoft.NET\Framework\v3.5\csc.exe /t:exe /out:bin\create_process.exe create_process.cs > $null
 
+Write-Output "  [*] driver_list.exe"
+C:\Windows\Microsoft.NET\Framework\v4.0.30319\csc.exe /t:exe /out:bin\driver_list.exe driver_list.cs > $null
+
 Write-Output "  [*] dump_dns.exe"
 C:\Windows\Microsoft.NET\Framework\v4.0.30319\csc.exe /t:exe /out:bin\dump_dns.exe dump_dns.cs > $null
 
@@ -23,6 +26,9 @@ C:\Windows\Microsoft.NET\Framework\v3.5\csc.exe /t:exe /out:bin\eventlog.exe eve
 
 Write-Output "  [*] freespace.exe"
 C:\Windows\Microsoft.NET\Framework\v2.0.50727\csc.exe /t:exe /out:bin\freespace.exe freespace.cs > $null
+
+Write-Output "  [*] farm_dns.exe"
+C:\Windows\Microsoft.NET\Framework\v3.5\csc.exe /t:exe /out:bin\farm_dns.exe farm_dns.cs > $null
 
 Write-Output "  [*] get_chrome_tab_info.exe"
 C:\Windows\Microsoft.NET\Framework\v4.0.30319\csc.exe /reference:"C:\Windows\Microsoft.NET\assembly\GAC_MSIL\UIAutomationTypes\v4.0_4.0.0.0__31bf3856ad364e35\UIAutomationTypes.dll" /reference:"C:\Windows\Microsoft.NET\assembly\GAC_MSIL\UIAutomationClient\v4.0_4.0.0.0__31bf3856ad364e35\UIAutomationClient.dll" /t:exe /out:bin\get_chrome_tab_info.exe get_chrome_tab_info.cs  > $null
@@ -50,6 +56,9 @@ C:\Windows\Microsoft.NET\Framework\v4.0.30319\csc.exe /reference:"C:\Windows\Mic
 
 Write-Output "  [*] window_list.exe"
 C:\Windows\Microsoft.NET\Framework\v2.0.50727\csc.exe /t:exe /out:bin\window_list.exe window_list.cs > $null
+
+Write-Output "  [*] wmi_query.exe"
+C:\Windows\Microsoft.NET\Framework\v3.5\csc.exe /t:exe /out:bin\wmi_query.exe wmi_query.cs > $null
 
 Write-Output "[+] Build Complete!"
 
