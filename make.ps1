@@ -51,6 +51,9 @@ C:\Windows\Microsoft.NET\Framework\v2.0.50727\csc.exe /t:exe /out:bin\readfile.e
 Write-Output "  [*] tasklist_svc.exe"
 C:\Windows\Microsoft.NET\Framework\v3.5\csc.exe /t:exe /out:bin\tasklist_svc.exe tasklist_svc.cs > $null
 
+Write-Output "  [*] tasklist_wmi.exe"
+C:\Windows\Microsoft.NET\Framework\v3.5\csc.exe /t:exe /out:bin\tasklist_wmi.exe tasklist_wmi.cs > $null
+
 Write-Output "  [*] taskkill.exe"
 C:\Windows\Microsoft.NET\Framework\v2.0.50727\csc.exe /t:exe /out:bin\taskkill.exe taskkill.cs > $null
 

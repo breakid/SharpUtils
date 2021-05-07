@@ -166,11 +166,33 @@ Lists processes, their PIDs, and their associated services (if applicable)
 
 
 
+### tasklist_wmi.exe
+List processes on local or remote system, optionally filter by ID, name, or WQL query.
+
+When using /FI, you must provide a Win32_Process-compatible WMI query language (WQL) condition string rather than a standard tasklist filter. You may use '%' as a wildcard
+
+**Uses WMI**
+**Requires administrative privileges if used against a remote host and for some local tasks (i.e., retrieving user context for processes owned by other users)**
+
+#### Usage
+    tasklist_wmi.exe [/S system [/U [domain\]username /P password]] [ [/PID processid | /IM imagename | /FI "WQL where clause"] ] [/V] [/D "<delimiter>"]
+
+#### Examples
+    tasklist_wmi.exe /v
+    
+    tasklist_wmi.exe /S 192.168.20.10 /FI "Name Like 'cmd%'"
+    
+    tasklist_wmi.exe /S 192.168.20.10 /FI "CommandLine Like '%svchost%'"
+    
+    tasklist_wmi.exe /S 192.168.20.10 /U Desktop-624L8K3\Administrator /P password /FI "CommandLine Like '%svchost%'"
+
+
+
 ### taskkill.exe
 Kills a single process by PID, or one or more processes by imagename. Optionally, target a remote host and/or provide plaintext username and password from the command-line.
 
 **Uses WMI**
-**Requires administrative privileges if used on a remote host and for some local tasks (i.e., killing processes with a different owner)**
+**Requires administrative privileges if used against a remote host and for some local tasks (i.e., killing processes with a different owner)**
 
 #### Usage
     taskkill.exe [/S <system> [/U [domain\]<username> /P <password>]] { [/PID <processid> | /IM <imagename>] }
