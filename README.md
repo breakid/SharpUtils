@@ -156,6 +156,16 @@ Read the contents of a file; optionally limit to X number of lines from the begi
 
 
 
+### tasklist_svc.exe
+Lists processes, their PIDs, and their associated services (if applicable)
+
+**Uses WMI**
+
+#### Usage
+    tasklist_svc.exe
+
+
+
 ### taskkill.exe
 Kills a single process by PID, or one or more processes by imagename. Optionally, target a remote host and/or provide plaintext username and password from the command-line.
 
