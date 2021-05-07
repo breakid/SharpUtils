@@ -171,7 +171,10 @@ List processes on local or remote system, optionally filter by ID, name, or WQL 
 
 When using /FI, you must provide a Win32_Process-compatible WMI query language (WQL) condition string rather than a standard tasklist filter. You may use '%' as a wildcard
 
+Verbose mode (/V) will return the user name under which the process is running; however, this uses .NET reflection (InvokeMethod) which can be slow.
+
 **Uses WMI**
+**Uses .NET Reflection**
 **Requires administrative privileges if used against a remote host and for some local tasks (i.e., retrieving user context for processes owned by other users)**
 
 #### Usage
