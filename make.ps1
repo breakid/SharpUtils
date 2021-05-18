@@ -24,11 +24,11 @@ C:\Windows\Microsoft.NET\Framework\v2.0.50727\csc.exe /t:exe /out:bin\env.exe en
 Write-Output "  [*] eventlog.exe"
 C:\Windows\Microsoft.NET\Framework\v3.5\csc.exe /t:exe /out:bin\eventlog.exe eventlog.cs > $null
 
-Write-Output "  [*] freespace.exe"
-C:\Windows\Microsoft.NET\Framework\v2.0.50727\csc.exe /t:exe /out:bin\freespace.exe freespace.cs > $null
-
 Write-Output "  [*] farm_dns.exe"
 C:\Windows\Microsoft.NET\Framework\v3.5\csc.exe /t:exe /out:bin\farm_dns.exe farm_dns.cs > $null
+
+Write-Output "  [*] freespace.exe"
+C:\Windows\Microsoft.NET\Framework\v2.0.50727\csc.exe /t:exe /out:bin\freespace.exe freespace.cs > $null
 
 Write-Output "  [*] get_chrome_tab_info.exe"
 C:\Windows\Microsoft.NET\Framework\v4.0.30319\csc.exe /reference:"C:\Windows\Microsoft.NET\assembly\GAC_MSIL\UIAutomationTypes\v4.0_4.0.0.0__31bf3856ad364e35\UIAutomationTypes.dll" /reference:"C:\Windows\Microsoft.NET\assembly\GAC_MSIL\UIAutomationClient\v4.0_4.0.0.0__31bf3856ad364e35\UIAutomationClient.dll" /t:exe /out:bin\get_chrome_tab_info.exe get_chrome_tab_info.cs  > $null
@@ -48,14 +48,14 @@ C:\Windows\Microsoft.NET\Framework\v2.0.50727\csc.exe /t:exe /out:bin\pagegrab.e
 Write-Output "  [*] readfile.exe"
 C:\Windows\Microsoft.NET\Framework\v2.0.50727\csc.exe /t:exe /out:bin\readfile.exe readfile.cs > $null
 
+Write-Output "  [*] taskkill.exe"
+C:\Windows\Microsoft.NET\Framework\v2.0.50727\csc.exe /t:exe /out:bin\taskkill.exe taskkill.cs > $null
+
 Write-Output "  [*] tasklist_svc.exe"
 C:\Windows\Microsoft.NET\Framework\v3.5\csc.exe /t:exe /out:bin\tasklist_svc.exe tasklist_svc.cs > $null
 
 Write-Output "  [*] tasklist_wmi.exe"
 C:\Windows\Microsoft.NET\Framework\v3.5\csc.exe /t:exe /out:bin\tasklist_wmi.exe tasklist_wmi.cs > $null
-
-Write-Output "  [*] taskkill.exe"
-C:\Windows\Microsoft.NET\Framework\v2.0.50727\csc.exe /t:exe /out:bin\taskkill.exe taskkill.cs > $null
 
 Write-Output "  [*] test_ad_creds.exe"
 C:\Windows\Microsoft.NET\Framework\v4.0.30319\csc.exe /reference:"C:\Windows\Microsoft.NET\assembly\GAC_MSIL\System.DirectoryServices.Protocols\v4.0_4.0.0.0__b03f5f7f11d50a3a\System.DirectoryServices.Protocols.dll" /t:exe /out:bin\test_ad_creds.exe test_ad_creds.cs  > $null

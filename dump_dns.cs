@@ -72,7 +72,7 @@ namespace DumpDNS
             for (int i = 0; i < args.Length; i++)
             {
                 string arg = args[i];
-            
+                
                 switch (arg.ToUpper()) {
                     case "-S":
                     case "/S":
@@ -500,7 +500,7 @@ namespace DumpDNS
                     }
                     catch (Exception e)
                     {
-                        Console.WriteLine("[-] ERROR: {0}", e.Message));
+                        Console.WriteLine("[-] ERROR: {0}", e.Message);
                     }
                 }
                 else
