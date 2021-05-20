@@ -15,7 +15,7 @@
  */
 
 // To Compile:
-//   C:\Windows\Microsoft.NET\Framework\v4.0.30319\csc.exe /t:exe /out:dump_dns.exe dump_dns.cs
+//   C:\Windows\Microsoft.NET\Framework\v4.0.30319\csc.exe /t:exe /out:bin\dump_dns.exe dump_dns.cs
 
 
 using System;
@@ -103,7 +103,7 @@ namespace DumpDNS
                         
                         if (File.Exists(outputFilepath))
                         {
-                            Console.WriteLine("[-] ERROR: Output file exists");
+                            Console.Error.WriteLine("[-] ERROR: Output file exists");
                             Console.WriteLine("\nDONE");
                             return;
                         }
@@ -156,47 +156,69 @@ namespace DumpDNS
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine("[-] ERROR: {0}", e.Message);
+                    Console.Error.WriteLine("[-] ERROR: {0}", e.Message);
                 }
             }
             
             if (domainName == "" && forestName == "" )
             {
-                Console.WriteLine("[-] ERROR: Auto-detection failed; please specify a domain and/or forest name");
+                Console.Error.WriteLine("[-] ERROR: Auto-detection failed; please specify a domain and/or forest name");
                 System.Environment.Exit(1);
             }
             
             string dDnsRoot = dDnsDn + dDomain;
             string fDnsRoot = fDnsDn + dForest;
             
-            // Allow Domain and Forest zones to be queries independently
-            if (domainName != "")
+            if (outputFilepath == "")
             {
-                output.Add(String.Format("\n[*] Domain: {0}", domainName));
-                try
+                // Allow Domain and Forest zones to be queried independently
+                if (domainName != "")
                 {
+                    Console.WriteLine("\n[*] Domain: {0}", domainName);
                     GetDNS(server, domainName, dDnsDn, dDnsRoot, includeTombstoned);
                 }
-                catch (Exception e)
+                
+                if (forestName != "")
                 {
-                    output.Add(String.Format("[-] ERROR: {0}", e.Message));
-                }
-            }
-            
-            if (forestName != "")
-            {
-                output.Add(String.Format("\n[*] Forest: {0}", forestName));
-                try
-                {
+                    Console.WriteLine("\n[*] Forest: {0}", forestName);
                     GetDNS(server, forestName, fDnsDn, fDnsRoot, includeTombstoned);
                 }
-                catch (Exception e)
+            }
+            else
+            {
+                // If outputFilepath specified, redirect standard output from the console to the output file
+                
+                // Set the buffer to 2MB
+                int buffer = 2 * 1024 * 1024;
+                
+                // Source: https://stackoverflow.com/questions/61074203/c-sharp-performance-comparison-async-vs-non-async-text-file-io-operation-via-r
+                using (FileStream stream = new FileStream(outputFilepath, FileMode.Create, FileAccess.Write, FileShare.Read, buffer, FileOptions.SequentialScan))
                 {
-                    output.Add(String.Format("[-] ERROR: {0}", e.Message));
+                    using (StreamWriter writer = new StreamWriter(stream, Encoding.UTF8))
+                    {
+                        Console.SetOut(writer);
+                        
+                        // Allow Domain and Forest zones to be queried independently
+                        if (domainName != "")
+                        {
+                            Console.WriteLine("\n[*] Domain: {0}", domainName);
+                            GetDNS(server, domainName, dDnsDn, dDnsRoot, includeTombstoned);
+                        }
+                        
+                        if (forestName != "")
+                        {
+                            Console.WriteLine("\n[*] Forest: {0}", forestName);
+                            GetDNS(server, forestName, fDnsDn, fDnsRoot, includeTombstoned);
+                        }
+                        
+                        // Source: https://docs.microsoft.com/en-us/dotnet/api/system.console.error?view=net-5.0
+                        // Recover the standard output stream so that a completion message can be displayed.
+                        StreamWriter stdout = new StreamWriter(Console.OpenStandardOutput());
+                        stdout.AutoFlush = true;
+                        Console.SetOut(stdout);
+                    }
                 }
             }
-            
-            WriteOutput(outputFilepath);
             
             Console.WriteLine("\nDONE");
         }
@@ -218,7 +240,7 @@ namespace DumpDNS
                 
                 if (!IPAddress.TryParse(server, out dnsAddr))
                 {
-                    Console.WriteLine("[-] ERROR: DNS server ({0}) could not be resolved; please specify an IP address", server);
+                    Console.Error.WriteLine("[-] ERROR: DNS server ({0}) could not be resolved; please specify an IP address", server);
                     System.Environment.Exit(1);
                 }
             }
@@ -231,20 +253,20 @@ namespace DumpDNS
         // bool      :   true (include tombstoned records or not)
         public static void GetDNS(string server, string FQN, string dnsDn, string dnsRoot, bool includeTombstoned)
         {
-            // If no server was explicitly specified, default to the domain or forest being queried
-            // Resolve IP so you know specifically which server was queried
-            if (server == "") {
-                server = GetIP(FQN);
-            }
-            
-            //Console.WriteLine("GetDNS('{0}', '{1}', '{2}', '{3}', '{4}')", server, FQN, dnsDn, dnsRoot, includeTombstoned); // DEBUG
-            
-            Dictionary<string, byte[]> hostList = new Dictionary<string, byte[]>();
-            List<string> privhostList = new List<string>();
-            string hostname = null;
-            
             try
             {
+                // If no server was explicitly specified, default to the domain or forest being queried
+                // Resolve IP so you know specifically which server was queried
+                if (server == "") {
+                    server = GetIP(FQN);
+                }
+                
+                //Console.WriteLine("GetDNS('{0}', '{1}', '{2}', '{3}', '{4}')", server, FQN, dnsDn, dnsRoot, includeTombstoned); // DEBUG
+                
+                Dictionary<string, byte[]> hostList = new Dictionary<string, byte[]>();
+                List<string> privhostList = new List<string>();
+                string hostname = null;
+                
                 DirectoryEntry entry = new DirectoryEntry("LDAP://" + server + "/" + dnsRoot);
                 
                 // Find DNS Zones
@@ -256,15 +278,19 @@ namespace DumpDNS
                 
                 foreach (SearchResult zone in searchZones.FindAll())
                 {
-                    output.Add("----------------------------------------------------------");
-                    output.Add(String.Format(" *  Querying Server: {0}", server));
-                    output.Add(String.Format(" *  DNS Zone: {0}", zone.Properties["Name"][0]));
-                    output.Add("----------------------------------------------------------");
+                    Console.WriteLine("----------------------------------------------------------");
+                    Console.WriteLine(" *  Querying Server: {0}", server);
+                    Console.WriteLine(" *  DNS Zone: {0}", zone.Properties["Name"][0]);
+                    Console.WriteLine("----------------------------------------------------------");
                     
                     DirectoryEntry zoneEntry = new DirectoryEntry(zone.Path);
                     
                     // Exclude objects that have been removed
                     String queryRecord = @"(&(objectClass=*)(!(DC=@))(!(DC=*DnsZones))(!(DC=*arpa))(!(DC=_*))(!dNSTombstoned=TRUE))";
+                    
+                    if (includeTombstoned) {
+                        queryRecord = @"(&(objectClass=*)(!(DC=@))(!(DC=*DnsZones))(!(DC=*arpa))(!(DC=_*)))";
+                    }
                     
                     DirectorySearcher searchRecord = new DirectorySearcher(zoneEntry, queryRecord);
                     
@@ -281,11 +307,6 @@ namespace DumpDNS
                                 
                                 // Resolve every record in case there are duplicate mappings
                                 ResolveDNSRecord(key, server, dnsByte);
-                                
-                                //if (!hostList.ContainsKey(key))
-                                //{
-                                //    hostList.Add(key, dnsByte);
-                                //}
                             }
                         }
                         // No permission to view records
@@ -323,7 +344,7 @@ namespace DumpDNS
             }
             catch (Exception e)
             {
-                output.Add(String.Format("[-] ERROR: {0}", e.Message));
+                Console.Error.WriteLine("[-] ERROR: {0}", e.Message);
             }
         }
         
@@ -345,7 +366,7 @@ namespace DumpDNS
                 ip = GetIP(hostname, server);
             }
             
-            output.Add(String.Format("    {0,-40}           {1,-40}", hostname, ip));
+            Console.WriteLine("    {0,-40}           {1,-40}", hostname, ip);
         }
         
         
@@ -356,13 +377,13 @@ namespace DumpDNS
             {
                 string ip = GetIP(hostname, server);
                 
-                output.Add(String.Format("    {0,-40}           {1,-40}", hostname, ip));
+                Console.WriteLine("    {0,-40}           {1,-40}", hostname, ip);
             }
             catch (Exception)
             {
                 if (includeTombstoned)
                 {
-                    output.Add(String.Format("    {0,-40}           {1,-40}", hostname, "Tombstone"));
+                    Console.WriteLine("    {0,-40}           {1,-40}", hostname, "Tombstone");
                 }
             }
         }
@@ -482,40 +503,6 @@ namespace DumpDNS
             }
             
             return String.Join(", ", addresses);
-        }
-        
-        
-        // Write output to file, if specified; otherwise output to screen
-        public static void WriteOutput(string outputFilepath)
-        {
-            if (outputFilepath != "")
-            {
-                if (!File.Exists(outputFilepath))
-                {
-                    Console.WriteLine("[*] Writing output to: {0}", outputFilepath);
-                    
-                    try
-                    {
-                        System.IO.File.WriteAllLines(outputFilepath, output);
-                    }
-                    catch (Exception e)
-                    {
-                        Console.WriteLine("[-] ERROR: {0}", e.Message);
-                    }
-                }
-                else
-                {
-                    Console.WriteLine("[-] ERROR: Output file exists");
-                }
-                
-            }
-            else
-            {
-                foreach (string line in output)
-                {
-                    Console.WriteLine(line);
-                }
-            }
         }
     }
 }
