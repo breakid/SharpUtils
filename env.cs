@@ -16,6 +16,8 @@ class Env {
             envVars.Add((string)de.Key, (string)de.Value);
         }
         
+        envVars.Sort();
+        
         foreach( KeyValuePair<string, string> kvp in envVars ) {
             Console.WriteLine("{0}={1}", kvp.Key, kvp.Value);
         }

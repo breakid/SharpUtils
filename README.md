@@ -44,6 +44,43 @@ Uses WMI to execute a command on the specified remote host
 
 
 
+### dsquery.exe
+Queries directory services (e.g., Active Directory). Only complex queries (dsquery *) are supported at this time, and the '-filter' option is required.
+
+- Can provide a space-delimited list of attributes to return or '*' to get all attributes. If the '-attr' argument is omitted, it defaults to '-attr *'
+- Can optionally limit the number of results returned using '-limit #'
+- Can optionally query a specified server (-s) or domain (-d); if both are provided, it will default to the specified server
+- Outputs in native table format by default (unless '-attr *' is specified, in which case list format is used); list format can be specified using the '-l' option. A '-t' option prints in table format with ASCII borders around each cell.
+- Can optionally provide a username and password to use for the query (-u and -p, respectively)
+- Can optionally provide a start node such as a specific OU; forestroot and domainroot are NOT supported at this time
+- Can optionally provide an output filepath (-o) where the results will be written; the '-b' option allows users to specify a buffer size in MB for the file writer
+
+The number of results returned by the search will be printed at the top of the output; while this deviates from the native output format, it can be very useful to help gauge the size of your query. Similarly the '-c' (count only) option was included for this reason.
+
+This can be run **without administrative privileges from any system that can communicate with directory services on the intended target**. If run from a domain-joined host, it will automatically run against the current domain unless the '-s' or '-d' options are specified. If run from a host that is not joined to a domain, the '-s' or '-d' options must be specified. The '-u' and '-p' options may be required as well if not running with domain credentials (e.g., from a runas session).
+
+#### Usage
+    dsquery * [startNode] -filter <filter_string> [-attr <attributes>] [-limit <number>] [-c | -l | -t] [[-s <server>] | [-d <domain>]] [-u <UserName>] [-p <password>] [-b <buffer_size_in_MB>] [-o <output_file>] [/?]
+    
+        [startNode]             Optional start node (e.g., specific OU; forestroot and domainroot 
+                                are NOT supported at this time)
+        -filter <filter>        Standard dsquery filter string
+        -attr <attributes>      Space-delimited list of attributes; use '*' to return all attributes
+                                If omitted, defaults to '-attr *'
+        -limit <number>         Limits query to <number> records
+        -c                      Count only; prints the number of records returned by a search and exits
+        -l                      Print in list format
+        -t                      Print in table format with ASCII borders around each cell
+        -s <server>             Query the specified server
+        -d <domain>             Query the specified domain
+        -u <username>           Authenticate using the specified username
+        -p <password>           Authenticate using the specified password
+        -o <output_filepath>    Write output to the specified file; will not overwrite an existing file
+        -b <buffer_size>        Write to output file in 'buffer_size' chunks (specified in MB)
+        /?                      Prints help
+
+
+
 ### driver_list.exe
 Displays info about installed drivers. Name and signer are displayed by default; normal verbose flag (/V) adds version number and DeviceID, and the very verbose flag (/VV) lists all driver properties.
 

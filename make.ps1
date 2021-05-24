@@ -15,6 +15,9 @@ C:\Windows\Microsoft.NET\Framework\v3.5\csc.exe /t:exe /out:bin\create_process.e
 Write-Output "  [*] driver_list.exe"
 C:\Windows\Microsoft.NET\Framework\v4.0.30319\csc.exe /t:exe /out:bin\driver_list.exe driver_list.cs > $null
 
+Write-Output "  [*] dsquery.exe"
+C:\Windows\Microsoft.NET\Framework\v4.0.30319\csc.exe /t:exe /out:bin\dsquery.exe dsquery.cs > $null
+
 Write-Output "  [*] dump_dns.exe"
 C:\Windows\Microsoft.NET\Framework\v4.0.30319\csc.exe /t:exe /out:bin\dump_dns.exe dump_dns.cs > $null
 

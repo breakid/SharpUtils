@@ -140,30 +140,75 @@ namespace FarmDNS
             Console.WriteLine(@"Performs reverse DNS lookups on the specified range of IP addresses (IPv4 only)
     
     USAGE:
-        farm_dns.exe <start_IP> <end_IP>");
+        farm_dns.exe [/T <seconds_to_sleep>] <start_IP> <end_IP>");
             Console.WriteLine("\nDONE");
         }
         
         public static void Main(string[] args)
         {
-            if (args.Length != 2)
+            if (args.Length >= 2)
             {
-                PrintUsage();
+                int throttle = 0;
+                IPAddress start = null;
+                IPAddress end = null;
+                
+                // Parse arguments
+                for (int i = 0; i < args.Length; i++)
+                {
+                    string arg = args[i];
+                    
+                    switch (arg.ToUpper()) {
+                        case "-T":
+                        case "/T":
+                            i++;
+                            
+                            // Catch error while attempting to parse the throttle time to prevent exception
+                            if (int.TryParse(args[i], out throttle) == false)
+                            {
+                                Console.Error.WriteLine("ERROR: Invalid throttle");
+                                Console.WriteLine("\nDONE");
+                                return;
+                            }
+                            break;
+                        case "/?":
+                            PrintUsage();
+                            return;
+                        default:
+                            start = ParseIP(args[i++]);
+                            
+                            if (i < args.Length)
+                            {
+                                end = ParseIP(args[i]);
+                            }
+                            break;
+                    }
+                }
+                
+                if (start != null && end != null)
+                {
+                    Console.WriteLine("[*] Farming IPs from: {0} to {1}", start, end);
+                    
+                    foreach (string ip in GetIPRange(start, end))
+                    {
+                        GetHostname(ip);
+                        
+                        // Sleep for throttle seconds
+                        if (throttle > 0)
+                        {
+                            System.Threading.Thread.Sleep(throttle * 1000);
+                        }
+                    }
+                }
+                else
+                {
+                    Console.Error.WriteLine("ERROR: Start and/or end address not specified");
+                }
+                
+                Console.WriteLine("\nDONE");
                 return;
             }
             
-            // Parse arguments
-            IPAddress start = ParseIP(args[0]);
-            IPAddress end = ParseIP(args[1]);
-            
-            Console.WriteLine("[*] Farming IPs from: {0} to {1}", start, end);
-            
-            foreach (string ip in GetIPRange(start, end))
-            {
-                GetHostname(ip);
-            }
-            
-            Console.WriteLine("\nDONE");
+            PrintUsage();
         }
     }
 }

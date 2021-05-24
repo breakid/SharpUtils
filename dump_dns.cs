@@ -30,7 +30,6 @@ namespace DumpDNS
 {
     public class DumpDNS
     {
-        public static List<string> output = new List<string>();
         public static IPAddress dnsAddr;
         
         public static void PrintUsage() {
