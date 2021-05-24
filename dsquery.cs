@@ -348,6 +348,8 @@ USAGE:
             // Search
             results = searcher.FindAll();
             
+            // Print the number of records returned
+            // Differs from native functionality, but it's convenient
             Console.WriteLine("Records Found: {0}\n", results.Count);
             
             if (!countOnly) {
@@ -389,10 +391,6 @@ USAGE:
     
     
     private static void PrintResults(SearchResultCollection results, bool adspathIncluded, bool listFormat, bool printDividers) {
-        // Print the number of records returned
-        // Differs from native functionality, but it's convenient
-        Console.WriteLine("Records Found: {0}\n", results.Count);
-        
         if (results.Count > 0) {
             // Get column names from PropertiesToLoad because it is in the user-specified order whereas PropertyNames is not
             string[] properties = results.PropertiesLoaded.ToArray();
