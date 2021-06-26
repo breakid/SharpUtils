@@ -240,12 +240,12 @@ Kills a single process by PID, or one or more processes by imagename. Optionally
 
 
 ### test_ad_creds.exe
-Authenticates against the specified Active Directory (AD) domain using the provided username and password; indicates whether the credentials are valid or not. Does not work with local credentials, only AD creds.
+Authenticates against the specified Active Directory (AD) domain using the provided username and password; indicates whether the credentials are valid or not. Can optionally specify a specific server with '/S'. Does not work with local credentials, only AD creds.
 
 **This WILL create a failed logon event if the credentials are not valid; use sparingly to avoid account lockout**
 
 #### Usage
-    test_ad_creds.exe <domain> <username> <password>
+    test_ad_creds.exe [/S <server>] <domain> <username> <password>
 
 
 

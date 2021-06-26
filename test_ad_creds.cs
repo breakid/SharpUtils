@@ -11,34 +11,70 @@ using System.DirectoryServices.Protocols;
 
 class TestADCreds {
     public static void PrintUsage() {
-        Console.WriteLine(@"Given an Active Directory domain, username, and password, returns whether the credentials are valid. Does not work on local accounts.
+        Console.WriteLine(@"Given an Active Directory domain, username, and password, returns whether the credentials are valid. Can optionally specify a specific server with '/S'. Does not work on local accounts.
 
 USAGE:
-    test_ad_creds.exe <domain> <username> <password>");
+    test_ad_creds.exe [/S <server>] <domain> <username> <password>");
         Console.WriteLine("\nDONE");
     }
     
     private const int ERROR_LOGON_FAILURE = 0x31;
-    private const int LDAP_SERVER_UNAVAILABLE = 0x51;
 
     public static void Main(string[] args) {
-        if (args.Length != 3) {
+        string domain = "";
+        string username = "";
+        string password = "";
+        string server = "";
+        string arg;
+        int argCount = 0;
+        
+        // Parse arguments
+        for (int i = 0; i < args.Length; i++) {
+            arg = args[i];
+            
+            switch (arg.ToUpper()) {
+                case "/?":
+                    PrintUsage();
+                    return;
+                case "-S":
+                case "/S":
+                    i++;
+                    server = args[i];
+                    break;
+                default:
+                    // Handle positional arguments
+                    switch(argCount) {
+                        case 0:
+                            domain = arg;
+                            break;
+                        case 1:
+                            username = arg;
+                            break;
+                        case 2:
+                            password = arg;
+                            break;
+                    }
+                    argCount++;
+                    break;
+            }
+        }
+        
+        // Print help and abort if domain, username, or password are missing
+        if (string.IsNullOrEmpty(domain) || string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password)) {
             PrintUsage();
             return;
         }
         
-        string domain = args[0];
-        string username = args[1];
-        string password = args[2];
+        // Use the domain as the server if one is not specified
+        if (string.IsNullOrEmpty(server)) {
+            server = domain;
+        }
         
         NetworkCredential credentials = new NetworkCredential(username, password, domain);
-
-        LdapDirectoryIdentifier id = new LdapDirectoryIdentifier(domain);
-
-        using (LdapConnection connection = new LdapConnection(id, credentials, AuthType.Kerberos)) {
-            connection.SessionOptions.Sealing = true;
-            connection.SessionOptions.Signing = true;
-
+        LdapDirectoryIdentifier id = new LdapDirectoryIdentifier(server);
+        
+        // Automatically negotiates the best authentication type
+        using (LdapConnection connection = new LdapConnection(id, credentials)) {
             try {
                 connection.Bind();
             } catch (LdapException lEx) {
@@ -46,13 +82,9 @@ USAGE:
                     Console.WriteLine("Invalid");
                     Console.WriteLine("\nDONE");
                     return;
-                } else if (lEx.ErrorCode == LDAP_SERVER_UNAVAILABLE) {
-                    Console.WriteLine("[-] ERROR: LDAP server is unavailable");
-                    Console.WriteLine("\nDONE");
-                    return;
                 }
                 
-                Console.WriteLine("[-] LDAP Error: " + lEx.ErrorCode.ToString("X"));
+                Console.WriteLine("[-] LDAP Error (" + lEx.ErrorCode.ToString("X") + "): " + lEx.Message);
                 Console.WriteLine("\nDONE");
                 return;
             }
