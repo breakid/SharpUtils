@@ -15,7 +15,7 @@ class TaskKill {
         Console.WriteLine(@"Kill process by ID or name
         
 USAGE:
-    taskkill [/S <system> [/U [domain\]<username> /P <password>]] { [/PID <processid> | /IM <imagename>] }");
+    taskkill [/S <system> [/U [domain\]<username> /P <password>]] { [/PID <processid>[,...] | /IM <imagename>] }");
         Console.WriteLine("\nDONE");
     }
     
@@ -37,7 +37,7 @@ USAGE:
         string system = "127.0.0.1";
         string username = "";
         string password = "";
-        int pid = -1;
+        string pid_str = "";
         string image = "";
         bool pid_set = false;
         bool image_set = false;
@@ -55,16 +55,8 @@ USAGE:
                 case "-PID":
                 case "/PID":
                     i++;
-                    
-                    // Catch error while attempting to parse the pid to prevent exception
-                    bool test = int.TryParse(args[i], out pid);
-                    if (test == false)
-                    {
-                        Console.WriteLine("Error: Invalid PID");
-                        Console.WriteLine("\nDONE");
-                        return;
-                    }
-                    pid_set = pid > -1;
+                    pid_str = args[i];
+                    pid_set = true;
                     break;
                 case "-IM":
                 case "/IM":
@@ -121,8 +113,8 @@ USAGE:
         
         // Override the query if PID was specified
         if (pid_set) {
-            queryStr = "select * from Win32_process where ProcessId = " + pid;
-            procID = "PID: " + pid;
+            queryStr = "select * from Win32_process where ProcessId = " + pid_str.Replace(",", " OR ProcessID = ");
+            procID = "PID: " + pid_str.Replace(",", ", ");
         }
         
         try {

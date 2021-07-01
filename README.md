@@ -229,13 +229,22 @@ Verbose mode (/V) will return the user name under which the process is running; 
 
 
 ### taskkill.exe
-Kills a single process by PID, or one or more processes by imagename. Optionally, target a remote host and/or provide plaintext username and password from the command-line.
+Kills one or more processes by PID or imagename; multiple PIDs should be provided as a comma-separated list. Optionally, target a remote host and/or provide plaintext username and password from the command-line.
 
 **Uses WMI**
 **Requires administrative privileges if used against a remote host and for some local tasks (i.e., killing processes with a different owner)**
 
 #### Usage
     taskkill.exe [/S <system> [/U [domain\]<username> /P <password>]] { [/PID <processid> | /IM <imagename>] }
+
+#### Examples
+    taskkill.exe /PID 964
+    
+    taskkill.exe /PID 340,1432
+    
+    taskkill.exe /IM Calculator.exe
+    
+    taskkill.exe /IM Calculator.exe /S 192.168.2.14
 
 
 
