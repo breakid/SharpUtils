@@ -10,7 +10,9 @@
 // To Compile:
 //   C:\Windows\Microsoft.NET\Framework\v2.0.50727\csc.exe /t:exe /out:pagegrab.exe pagegrab.cs
 
+using Microsoft.Win32;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Text;
@@ -30,24 +32,64 @@ public class PageGrab {
         }
         
         string url = "";
+        string edgeVersion = Registry.GetValue("HKEY_LOCAL_MACHINE\\SOFTWARE\\WOW6432Node\\Microsoft\\EdgeUpdate\\Clients\\{56EB18F8-B008-4CBD-B6D2-8C97FE7E9062}", "pv", "").ToString();
+        string userAgent = "";
         string proxyAddress = "";
         string method = "GET";
         string postData = "";
         bool verbose = false;
+        Dictionary<string, string> headers = new Dictionary<string, string>();
+        
+        List<string> unsupportedHeaders = new List<string>();
+        unsupportedHeaders.Add("Date");
+        unsupportedHeaders.Add("Host");
+        unsupportedHeaders.Add("If-Modified-Since");
         
         // Parse arguments
         for (int i = 0; i < args.Length; i++) {
             string arg = args[i];
-        
+            
             switch (arg.ToUpper()) {
                 case "-D": // POST data
                     i++;
-                    postData = args[i];
-                    break;
                     
+                    if (i < args.Length) {
+                        postData = args[i];
+                    } else {
+                        Console.WriteLine("[-] ERROR: No POST data specified");
+                        Console.WriteLine("\nDONE");
+                        return 1;
+                    }
+                    break;
+                
+                case "-H": // Header (multiples are allowed)
+                    i++;
+                    
+                    // Throw an error and exit if an unsupported header is specified
+                    if (i < args.Length && unsupportedHeaders.Contains(args[i])) {
+                        Console.WriteLine("[-] ERROR: Unsupported header specified:" + args[i]);
+                        Console.WriteLine("\nDONE");
+                        return 1;
+                    } else if (i + 1 < args.Length) {
+                        // Treat specified headers are a key-value pair
+                        headers.Add(args[i++], args[i]);
+                    } else {
+                        Console.WriteLine("[-] ERROR: Incomplete header specified");
+                        Console.WriteLine("\nDONE");
+                        return 1;
+                    }
+                    break;
+                
                 case "-M": // HTTP Method
                     i++;
-                    method = args[i].ToUpper();
+                    
+                    if (i < args.Length) {
+                        method = args[i].ToUpper();
+                    } else {
+                        Console.WriteLine("[-] ERROR: No HTTP Method specified");
+                        Console.WriteLine("\nDONE");
+                        return 1;
+                    }
                     
                     string[] methods = {"GET", "HEAD", "POST", "PUT", "DELETE", "CONNECT", "OPTIONS", "TRACE"};
                     
@@ -58,10 +100,17 @@ public class PageGrab {
                         return 1;
                     }
                     break;
-                    
+                
                 case "-P": // Proxy
                     i++;
-                    proxyAddress = args[i];
+                    
+                    if (i < args.Length) {
+                        proxyAddress = args[i];
+                    } else {
+                        Console.WriteLine("[-] ERROR: No Proxy info specified");
+                        Console.WriteLine("\nDONE");
+                        return 1;
+                    }
                     
                     Regex rex = new Regex(@"https?://.*:\d{1,5}", RegexOptions.IgnoreCase);
                     
@@ -72,7 +121,11 @@ public class PageGrab {
                     }
                     
                     break;
-                    
+                
+                case "-Q": // Query user agent
+                    Console.WriteLine("[*] INFO: Edge version: " + edgeVersion);
+                    return 0;
+                
                 case "-V": // Verbose output
                     verbose = true;
                     break;
@@ -86,9 +139,74 @@ public class PageGrab {
         if (url.Length != 0) {
             try {
                 // Initialize request
-                WebRequest request = WebRequest.Create(url);
+                HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
                 request.Credentials = CredentialCache.DefaultCredentials;
                 request.Method = method;
+                
+                // Add user-specified headers
+                foreach (KeyValuePair<string, string> header in headers) {
+                    switch(header.Key) {
+                        case "Accept":
+                            request.Accept = header.Value;
+                            break;
+                        case "Connection":
+                            request.Connection = header.Value;
+                            break;
+                        case "Content-Length":
+                            request.ContentLength = long.Parse(header.Value);
+                            break;
+                        case "Content-Type":
+                            request.ContentType = header.Value;
+                            break;
+                        case "Expect":
+                            request.Expect = header.Value;
+                            break;
+                        case "Range":
+                            string[] ranges = header.Value.Split('-');
+                            
+                            if (ranges.Length >= 2) {
+                                if (ranges[0] == "") {
+                                    // Specified range is negative
+                                    request.AddRange(int.Parse("-" + ranges[1]));
+                                } else {
+                                    // To and From are specified; additional ranges unsupported at this time
+                                    request.AddRange(int.Parse(ranges[0]), int.Parse(ranges[1]));
+                                }
+                            } else {
+                                // Specified range is negative
+                                request.AddRange(int.Parse(ranges[0]));
+                            }
+                            
+                            break;
+                        case "Referer":
+                            request.Referer = header.Value;
+                            break;
+                        case "Transfer-Encoding":
+                            request.TransferEncoding = header.Value;
+                            break;
+                        case "User-Agent":
+                            userAgent = header.Value;
+                            break;
+                        default:
+                            request.Headers[header.Key] = header.Value;
+                            break;
+                    }
+                }
+                
+                // If no user agent is specified, pull the current version of Edge as a default
+                // NOTE: This isn't perfect because the Chrome version number won't match, but it's better probably better than sending nothing
+                if (userAgent == "") {
+                    if (edgeVersion == "") {
+                        Console.WriteLine("[-] ERROR: Unable to auto-detect Edge version; please specify a user agent");
+                        Console.WriteLine("\nDONE");
+                        return 1;
+                    } else {
+                        userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.107 Safari/537.36 Edg/" + edgeVersion;
+                    }
+                }
+                
+                request.UserAgent = userAgent;
+                
                 
                 // Print request data
                 Console.WriteLine("REQUEST");

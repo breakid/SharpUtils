@@ -177,11 +177,32 @@ Lists logical drives (using WMI), including total and available free space. Mapp
 ### pagegrab.exe
 Makes a web request; can be used to check external connectivity or get the content of an internal web page without going through the trouble of setting up a SOCKS proxy.
 
-Can optionally specify the HTTP method, POST request data, and/or a proxy server address/port. The `-v` flag causes the HTML contents of the page to be printed; if omitted, only the response headers will be shown.
+Can optionally specify the HTTP method, POST request data (if applicable), a proxy server/port, and an arbitrary number of headers.
+
+Custom headers are supported; however, `Date`, `Host`, and `If-Modified-Since` are not. Headers are case sensitive and will be sent the way they are specified on the command-line. Headers must be specified in key-value pairs (header name, header value). If no `User-Agent` is specified, a hardcoded User-Agent string using the current version of Edge will be used; this is not perfect since the current version of Edge will not match the Chrome version, but it's probably better than sending no user-agent.
+
+The `Proxy` header will always show in the printed output; however, if the value is `None`, no `Proxy` header was sent as part of the request.
+
+The `-v` flag causes the HTML contents of the page to be printed; if omitted, only the response headers will be shown. 
 
 #### Usage
-    pagegrab.exe [-p http(s)://<proxy>:<proxy_port>] [-m <method>] [-d <URL encoded POST data>] [-v] <URL>
+    pagegrab.exe [-p http(s)://<proxy>:<proxy_port>] [-m <method>] [-d <URL encoded POST data>] [-h <header_1_name> <header_1_value> [-h <header_2_name> <header_2_value>]] [-v] <URL>
       -v  Print the HTML contents of the response
+
+#### Examples
+    pagegrab.exe https://google.com -h User-Agent "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.114 Safari/537.36 Edg/89.0.774.75"
+    
+    GET https://example.com
+    User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.114 Safari/537.36 Edg/89.0.774.75
+    
+    pagegrab.exe https://example.com -h Referer https://www.google.com -h DNT 1 -h Cache-Control no-cache
+        
+    GET https://example.com
+    Proxy: None
+    Referer: https://www.google.com
+    DNT: 1
+    Cache-Control: no-cache
+    User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.107 Safari/537.36 Edg/92.0.902.67
 
 
 
