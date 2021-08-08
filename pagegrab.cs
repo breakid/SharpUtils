@@ -22,7 +22,7 @@ public class PageGrab {
     public static int Main(string[] args) {
         if (args.Length == 0) {
             // Print usage
-            Console.WriteLine(@"USAGE: pagegrab.exe [-p http(s)://<proxy>:<proxy_port>] [-m <method>] [-d <URL encoded POST data>] [-v] <URL>
+            Console.WriteLine(@"USAGE: pagegrab.exe [-p http(s)://<proxy>:<proxy_port>] [-m <method>] [-d <URL encoded POST data>] [-h <header_1_name> <header_1_value> [-h <header_2_name> <header_2_value>]] [-v] <URL>
             
     -v  Print the HTML contents of the response
             ");
