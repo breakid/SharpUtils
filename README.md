@@ -290,12 +290,21 @@ Displays a list of visible windows and their associated process.
 
 
 ### wmi_query.exe
-Runs the specified WMI query and displays properties in key-value pairs. The query string must be in quotes.
+Runs the specified WMI query and displays properties in key-value pairs. The query string must be in quotes. The default server is localhost, and the default namespace is "root\cimv2".
 
 **Uses WMI** (...obviously)
 
 #### Usage
-    wmi_query.exe [/V] [/O <output_filepath>] "<wmi_query>"
+    wmi_query.exe [/S <system> [/U [domain\]<username> /P <password>]] [-N <namespace>] [/O <output_filepath>] [/V] "<wmi_query>"
+
+#### Examples
+    wmi_query.exe "Select * from win32_process"
+    
+    wmi_query.exe -S DC01.MGMT.LOCAL -N root\standardcimv2 "Select * from MSFT_NetTCPConnection"
+    
+    wmi_query.exe -S DC01.MGMT.LOCAL -U MGMT\Administrator -P password -N root\standardcimv2 "Select * from MSFT_NetTCPConnection"
+
+
 
 ---
 
