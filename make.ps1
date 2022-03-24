@@ -45,6 +45,9 @@ C:\Windows\Microsoft.NET\Framework\v2.0.50727\csc.exe /t:exe /out:bin\icacls.exe
 Write-Output "  [*] lld.exe"
 C:\Windows\Microsoft.NET\Framework\v3.5\csc.exe /t:exe /out:bin\lld.exe lld.cs > $null
 
+Write-Output "  [*] netstat.exe"
+C:\Windows\Microsoft.NET\Framework\v3.5\csc.exe /t:exe /out:bin\netstat.exe netstat.cs > $null
+
 Write-Output "  [*] pagegrab.exe"
 C:\Windows\Microsoft.NET\Framework\v2.0.50727\csc.exe /t:exe /out:bin\pagegrab.exe pagegrab.cs > $null
 

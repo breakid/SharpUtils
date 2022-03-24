@@ -151,7 +151,7 @@ Displays the URL of the current tab and the titles of all tabs in foremost Chrom
 Lists patches, optionally including verbose information such as Description, InstalledBy, and InstalledOn.
 
 #### Usage
-    get_hotfix.exe [/S system] [/U [domain\]username /P password] [/V]
+    get_hotfix.exe [/S <system>] [/U [<domain>\]<username> /P <password>] [/V]
 
 
 
@@ -171,6 +171,25 @@ Lists logical drives (using WMI), including total and available free space. Mapp
 
 #### Usage
     lld.exe [system]
+
+
+
+### netstat.exe
+Lists listening TCP and UDP ports, and active TCP connections (equivalent to 'netstat -ano'); optionally writes output to a file. TCP or UDP can be specified to show only the matching data.
+
+**Uses WMI**
+
+#### Usage
+    netstat.exe [/S <system> [/U [<domain>\]<username> /P <password>]] [/O <output_filepath>] [TCP | UDP]
+
+#### Examples
+    netstat.exe
+    
+    netstat.exe udp
+    
+    netstat.exe -S DC01.MGMT.LOCAL tcp
+    
+    netstat.exe -S DC01.MGMT.LOCAL -U MGMT\Administrator -P password
 
 
 
@@ -236,7 +255,7 @@ Verbose mode (/V) will return the user name under which the process is running; 
 **Requires administrative privileges if used against a remote host and for some local tasks (i.e., retrieving user context for processes owned by other users)**
 
 #### Usage
-    tasklist_wmi.exe [/S system [/U [domain\]username /P password]] [ [/PID processid | /IM imagename | /FI "WQL where clause"] ] [/V] [/D "<delimiter>"]
+    tasklist_wmi.exe [/S <system> [/U [<domain>\]<username> /P <password>]] [ [/PID <processid> | /IM <imagename> | /FI <"WQL where clause">] ] [/V] [/D "<delimiter>"]
 
 #### Examples
     tasklist_wmi.exe /v
@@ -256,7 +275,7 @@ Kills one or more processes by PID or imagename; multiple PIDs should be provide
 **Requires administrative privileges if used against a remote host and for some local tasks (i.e., killing processes with a different owner)**
 
 #### Usage
-    taskkill.exe [/S <system> [/U [domain\]<username> /P <password>]] { [/PID <processid> | /IM <imagename>] }
+    taskkill.exe [/S <system> [/U [<domain>\]<username> /P <password>]] { [/PID <processid> | /IM <imagename>] }
 
 #### Examples
     taskkill.exe /PID 964
@@ -295,7 +314,7 @@ Runs the specified WMI query and displays properties in key-value pairs. The que
 **Uses WMI** (...obviously)
 
 #### Usage
-    wmi_query.exe [/S <system> [/U [domain\]<username> /P <password>]] [-N <namespace>] [/O <output_filepath>] [/V] "<wmi_query>"
+    wmi_query.exe [/S <system> [/U [<domain>\]<username> /P <password>]] [-N <namespace>] [/O <output_filepath>] [/V] "<wmi_query>"
 
 #### Examples
     wmi_query.exe "Select * from win32_process"

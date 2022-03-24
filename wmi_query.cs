@@ -132,13 +132,6 @@ USAGE:
             
             try
             {
-                /*string scope = name_space;
-                
-                if (!String.IsNullOrEmpty(system)) {
-                    scope = "\\\\" + system + "\\" + name_space;
-                }
-                */
-                
                 ConnectionOptions conn_opts = new ConnectionOptions();
                 
                 // Apply username and password if specified
