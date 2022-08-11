@@ -129,8 +129,8 @@ class dsquery {
 USAGE:
     dsquery * [startNode] -filter <filter_string> [-attr <attributes>] [-limit <number>] [-c | -l | -t] [[-s <server>] | [-d <domain>]] [-u <UserName>] [-p <password>] [-b <buffer_size_in_MB>] [-o <output_file>] [/?]
     
-        [startNode]             Optional start node (e.g., specific OU; forestroot and domainroot 
-                                are NOT supported at this time)
+        [startNode]             Optional start node (e.g., specific OU; domainroot is NOT supported
+                                at this time)
         -filter <filter>        Standard dsquery filter string
         -attr <attributes>      Space-delimited list of attributes; use '*' to return all attributes
                                 If omitted, defaults to '-attr *'
@@ -330,7 +330,19 @@ USAGE:
             
             // Set the start node, if applicable
             if (!string.IsNullOrEmpty(startNode)) {
-                searcher.SearchRoot = new DirectoryEntry("LDAP://" + startNode);
+                if (startNode.ToUpper() == "FORESTROOT") {
+                    if (!string.IsNullOrEmpty(server)) {
+                        searcher.SearchRoot = new DirectoryEntry("GC://" + server);
+                    } else if (!string.IsNullOrEmpty(domain)) {
+                        searcher.SearchRoot = new DirectoryEntry("GC://" + domain);
+                    } else {
+                        DirectoryEntry tempRootEntry = new DirectoryEntry("LDAP://rootDSE");
+                        string currentdomain = (string) (tempRootEntry.Properties["defaultNamingContext"].Value);
+                        searcher.SearchRoot = new DirectoryEntry("GC://" + currentdomain);
+                    }
+                } else {
+                    searcher.SearchRoot = new DirectoryEntry("LDAP://" + startNode);
+                }
             }
             
             searcher.Filter = filter;
