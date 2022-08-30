@@ -345,6 +345,7 @@ USAGE:
                 }
             }
             
+            searcher.PageSize = 1000;
             searcher.Filter = filter;
             
             // Set the limit, if applicable
