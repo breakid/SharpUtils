@@ -171,7 +171,7 @@ USAGE:
     public static void Main(string[] args)
     {
         SearchResultCollection results = null;
-        
+
         try
         {
             if (args.Length == 0 || (args.Length > 0 && args[0] == "/?"))

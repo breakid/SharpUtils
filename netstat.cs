@@ -31,7 +31,7 @@ namespace Netstat
                 }
             }
         }
-        
+
         private static void PrintUsage()
         {
             Console.WriteLine(@"Lists listening TCP and UDP ports, and active TCP connection (equivalent to 'netstat -ano'); optionally writes output to a file
@@ -48,24 +48,26 @@ USAGE:
         
         netstat.exe -S DC01.MGMT.LOCAL -U MGMT\Administrator -P password");
         }
-        
+
         public static void Main()
         {
-            try {
+            try
+            {
                 string outputFilepath = "";
                 string system = ".";
                 string username = "";
                 string password = "";
                 string protocol = "";
-            
+
                 // Parse arguments
                 string[] args = Environment.GetCommandLineArgs();
-                
+
                 for (int i = 1; i < args.Length; i++)
                 {
                     string arg = args[i];
-                
-                    switch (arg.ToUpper()) {
+
+                    switch (arg.ToUpper())
+                    {
                         case "-O":
                         case "/O":
                             i++;
@@ -129,8 +131,9 @@ USAGE:
                             return;
                         default:
                             protocol = args[i].ToUpper();
-                            
-                            if (!(protocol.Equals("TCP") || protocol.Equals("UDP"))) {
+
+                            if (!(protocol.Equals("TCP") || protocol.Equals("UDP")))
+                            {
                                 throw new ArgumentException("Invalid protocol specified");
                             }
                             break;
@@ -138,26 +141,29 @@ USAGE:
                 }
 
                 ConnectionOptions conn_opts = new ConnectionOptions();
-                
+
                 // Apply username and password if specified
-                if (username.Length > 0 && password.Length > 0) {
+                if (username.Length > 0 && password.Length > 0)
+                {
                     conn_opts.Username = username;
                     conn_opts.Password = password;
-                } else if (username.Length > 0 || password.Length > 0) {
+                }
+                else if (username.Length > 0 || password.Length > 0)
+                {
                     // Throw an exception if username or password were specified, but not both
                     throw new ArgumentException("Please specify username and password");
                 }
-                
+
                 // Keep track of the max length of each entry in order to dynamically space the columns
                 int localAddrMaxSize = 13;       // Length of "Local Address"
                 int remoteAddrMaxSize = 15;      // Length of "Foreign Address"
                 int stateMaxSize = 5;            // Length of "State"
                 int colPadding = 4;
-                Dictionary<string,string> entry;
-                List<Dictionary<string,string>> entries = new List<Dictionary<string,string>>();
-                
+                Dictionary<string, string> entry;
+                List<Dictionary<string, string>> entries = new List<Dictionary<string, string>>();
+
                 // Lookup table for TCP connection states
-                Dictionary<string,string> tcpStates = new Dictionary<string,string>();
+                Dictionary<string, string> tcpStates = new Dictionary<string, string>();
                 tcpStates.Add("1", "Closed");
                 tcpStates.Add("2", "LISTENING");
                 tcpStates.Add("3", "SYN_SENT");
@@ -171,120 +177,139 @@ USAGE:
                 tcpStates.Add("11", "TIME_WAIT");
                 tcpStates.Add("12", "DELETE_TCB");
                 tcpStates.Add("100", "BOUND");
-                
+
                 ManagementPath path = new ManagementPath() { NamespacePath = @"root\standardcimv2", Server = system };
                 ManagementScope scope = new ManagementScope(path, conn_opts);
                 SelectQuery query;
-                
+
                 // Display TCP if it's specified or no protocol was specified
-                if (protocol.Equals("TCP") || protocol.Equals("")) {
+                if (protocol.Equals("TCP") || protocol.Equals(""))
+                {
                     // Query for TCP ports and connections; return specified attributes
-                    query = new SelectQuery("MSFT_NetTCPConnection", null, new string[] { "LocalAddress", "LocalPort", "RemoteAddress", "RemotePort", "State", "OwningProcess"});
-                    
-                    using (var searcher = new ManagementObjectSearcher(scope, query)) {
-                        foreach (ManagementObject obj in searcher.Get()) {
-                            if (obj != null) {
-                                entry = new Dictionary<string,string>();
-                                
+                    query = new SelectQuery("MSFT_NetTCPConnection", null, new string[] { "LocalAddress", "LocalPort", "RemoteAddress", "RemotePort", "State", "OwningProcess" });
+
+                    using (var searcher = new ManagementObjectSearcher(scope, query))
+                    {
+                        foreach (ManagementObject obj in searcher.Get())
+                        {
+                            if (obj != null)
+                            {
+                                entry = new Dictionary<string, string>();
+
                                 entry.Add("protocol", "TCP");
                                 // Use a lookup to convert the state code into a human-readable string
                                 entry.Add("state", tcpStates[obj.GetPropertyValue("State").ToString()]);
                                 entry.Add("pid", obj.GetPropertyValue("OwningProcess").ToString());
-                                
-                                if (obj.GetPropertyValue("LocalAddress").ToString().Contains(":")) {
+
+                                if (obj.GetPropertyValue("LocalAddress").ToString().Contains(":"))
+                                {
                                     // IPv6 address
                                     entry.Add("local_address", "[" + obj.GetPropertyValue("LocalAddress").ToString() + "]:" + obj.GetPropertyValue("LocalPort").ToString());
                                     entry.Add("remote_address", "[" + obj.GetPropertyValue("RemoteAddress").ToString() + "]:" + obj.GetPropertyValue("RemotePort").ToString());
-                                } else {
+                                }
+                                else
+                                {
                                     // IPv4 address
                                     entry.Add("local_address", obj.GetPropertyValue("LocalAddress").ToString() + ":" + obj.GetPropertyValue("LocalPort").ToString());
                                     entry.Add("remote_address", obj.GetPropertyValue("RemoteAddress").ToString() + ":" + obj.GetPropertyValue("RemotePort").ToString());
                                 }
-                                
+
                                 entries.Add(entry);
-                                
+
                                 // Calculate the max length of each column (for dynamic spacing)
-                                if (entry["local_address"].Length > localAddrMaxSize) {
+                                if (entry["local_address"].Length > localAddrMaxSize)
+                                {
                                     localAddrMaxSize = entry["local_address"].Length;
                                 }
-                                
-                                if (entry["remote_address"].Length > remoteAddrMaxSize) {
+
+                                if (entry["remote_address"].Length > remoteAddrMaxSize)
+                                {
                                     remoteAddrMaxSize = entry["remote_address"].Length;
                                 }
-                                
-                                if (entry["state"].Length > stateMaxSize) {
+
+                                if (entry["state"].Length > stateMaxSize)
+                                {
                                     stateMaxSize = entry["state"].Length;
                                 }
                             }
                         }
                     }
                 }
-                
+
                 // Display UDP if it's specified or no protocol was specified
-                if (protocol.Equals("UDP") || protocol.Equals("")) {
+                if (protocol.Equals("UDP") || protocol.Equals(""))
+                {
                     // Query for UDP ports; return specified attributes
-                    query = new SelectQuery("MSFT_NetUDPEndpoint", null, new string[] { "LocalAddress", "LocalPort", "OwningProcess"});
-                    
-                    using (var searcher = new ManagementObjectSearcher(scope, query)) {
-                        foreach (ManagementObject obj in searcher.Get()) {
-                            if (obj != null) {
-                                entry = new Dictionary<string,string>();
-                                
+                    query = new SelectQuery("MSFT_NetUDPEndpoint", null, new string[] { "LocalAddress", "LocalPort", "OwningProcess" });
+
+                    using (var searcher = new ManagementObjectSearcher(scope, query))
+                    {
+                        foreach (ManagementObject obj in searcher.Get())
+                        {
+                            if (obj != null)
+                            {
+                                entry = new Dictionary<string, string>();
+
                                 entry.Add("protocol", "UDP");
                                 entry.Add("state", "");
                                 entry.Add("remote_address", "*:*");
                                 entry.Add("pid", obj.GetPropertyValue("OwningProcess").ToString());
-                                
-                                if (obj.GetPropertyValue("LocalAddress").ToString().Contains(":")) {
+
+                                if (obj.GetPropertyValue("LocalAddress").ToString().Contains(":"))
+                                {
                                     // IPv6 address
                                     entry.Add("local_address", "[" + obj.GetPropertyValue("LocalAddress").ToString() + "]:" + obj.GetPropertyValue("LocalPort").ToString());
-                                } else {
+                                }
+                                else
+                                {
                                     // IPv4 address
                                     entry.Add("local_address", obj.GetPropertyValue("LocalAddress").ToString() + ":" + obj.GetPropertyValue("LocalPort").ToString());
                                 }
-                                
+
                                 entries.Add(entry);
-                                
+
                                 // Calculate the max length of the local address column (remote address and state and not populated)
-                                if (entry["local_address"].Length > localAddrMaxSize) {
+                                if (entry["local_address"].Length > localAddrMaxSize)
+                                {
                                     localAddrMaxSize = entry["local_address"].Length;
                                 }
                             }
                         }
                     }
                 }
-                
+
                 // Add extra padding to separate the columns
                 localAddrMaxSize += colPadding;
                 remoteAddrMaxSize += colPadding;
                 stateMaxSize += colPadding;
-                
+
                 List<string> output = new List<string>();
                 string line;
-                
+
                 // Convert dictionary of network entries to a string with each column dynamically padded
-                foreach (Dictionary<string,string> row in entries) {
+                foreach (Dictionary<string, string> row in entries)
+                {
                     line = "  " + row["protocol"] + "    ";
                     line += row["local_address"].PadRight(localAddrMaxSize);
                     line += row["remote_address"].PadRight(remoteAddrMaxSize);
                     line += row["state"].PadRight(stateMaxSize);
                     line += row["pid"];
-                    
+
                     output.Add(line);
                 }
-                
+
                 // Sort the output to make it look cleaner
                 output.Sort();
-                
+
                 // Prepend table header after sorting
                 line = "\nActive Connections\n\n  Proto  ";
                 line += "Local Address".PadRight(localAddrMaxSize);
                 line += "Foreign Address".PadRight(remoteAddrMaxSize);
                 line += "State".PadRight(stateMaxSize);
                 line += "PID";
-                
+
                 output.Insert(0, line);
-                
+
                 WriteOutput(outputFilepath, output);
             }
             catch (Exception e)

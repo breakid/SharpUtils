@@ -157,7 +157,6 @@ USAGE:
                         verbose_set = true;
                         break;
                     case "/?":
-                    //default:
                         PrintUsage();
                         return;
                 }

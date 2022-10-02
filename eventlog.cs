@@ -141,7 +141,8 @@ EXAMPLES:
         catch (Exception e)
         {
             Console.Error.WriteLine("[-] ERROR: {0}", e.Message.Trim());
-        } finally
+        }
+        finally
         {
             Console.WriteLine("\nDONE");
         }
