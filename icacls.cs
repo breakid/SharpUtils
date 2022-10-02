@@ -7,50 +7,61 @@ using System;
 using System.IO;
 using System.Security.AccessControl;
 
+
 namespace icacls
 {
     class Program
     {
         public static void Main(string[] args)
         {
-            if (args.Length == 0) {
-                Console.WriteLine(@"Displays permissions, grouped by user/group, for each file or directory specified
+            try
+            {
+                if (args.Length == 0 || (args.Length > 0 && args[0] == "/?"))
+                {
+                    Console.WriteLine(@"Displays permissions, grouped by user/group, for each file or directory specified
 
 USAGE:
-    icacls.exe <file_or_directory>
+    icacls.exe <file_or_directory> [...] [/?]
 
     Example:
-        icacls.exe passwords.txt" + "\n");
-            } else {
-                try
+        icacls.exe passwords.txt users.txt");
+                }
+                else
                 {
-                    foreach (string path in args) {
+                    int i = 0;
+
+                    foreach (string path in args)
+                    {
                         Console.WriteLine("Permissions for: " + path);
-                        
+
                         FileSecurity fSecurity = new FileSecurity(path, AccessControlSections.Access);
-                        
+
                         foreach (FileSystemAccessRule fsar in fSecurity.GetAccessRules(true, true, typeof(System.Security.Principal.NTAccount)))
                         {
-                            string userName = fsar.IdentityReference.Value;
-                            string userRights = fsar.FileSystemRights.ToString();
-                            string userAccessType = fsar.AccessControlType.ToString();
-                            string ruleSource = fsar.IsInherited ? "Inherited" : "Explicit";
-                            string rulePropagation = fsar.PropagationFlags.ToString();
-                            string ruleInheritance = fsar.InheritanceFlags.ToString();
-                            Console.WriteLine("  " + userName + "\n    Type:\t\t" + userAccessType + "\n    Rights:\t\t" + userRights + "\n    Source:\t\t" + ruleSource + "\n    Propagation:\t" + rulePropagation + "\n    Inheritance:\t" + ruleInheritance);
+                            Console.WriteLine("  {0}", fsar.IdentityReference.Value);
+                            Console.WriteLine("    Type: {0}", fsar.AccessControlType);
+                            Console.WriteLine("    Rights: {0}", fsar.FileSystemRights);
+                            Console.WriteLine("    Source: {0}", fsar.IsInherited ? "Inherited" : "Explicit");
+                            Console.WriteLine("    Propagation: {0}", fsar.PropagationFlags);
+                            Console.WriteLine("    Inheritance: {0}", fsar.InheritanceFlags);
                         }
-        
-                        // Print extra space in case multiple paths are specified
-                        Console.WriteLine("\n");
+
+                        // Print extra space as a separator when multiple paths are specified
+                        if (i++ < args.Length - 1)
+                        {
+                            Console.WriteLine("");
+                        }
                     }
                 }
-                catch (Exception e) 
-                {
-                    Console.WriteLine(e);
-                }
             }
-            
-            Console.WriteLine("DONE");
+            catch (Exception e)
+            {
+                Console.Error.WriteLine("[-] ERROR: {0}", e.Message.Trim());
+            }
+            finally
+            {
+                Console.WriteLine("\nDONE");
+            }
         }
     }
 }

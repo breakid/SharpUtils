@@ -4,8 +4,7 @@
 
 
 // To Compile:
-//   C:\Windows\Microsoft.NET\Framework\v3.5\csc.exe /t:exe /out:wmi_query.exe wmi_query.cs
-
+//   C:\Windows\Microsoft.NET\Framework\v3.5\csc.exe /t:exe /out:netstat.exe netstat.cs
 
 
 using System;
@@ -22,15 +21,7 @@ namespace Netstat
             if (outputFilepath != "")
             {
                 Console.WriteLine("[*] Writing output to: {0}", outputFilepath);
-                
-                try
-                {
-                    System.IO.File.WriteAllLines(outputFilepath, output.ToArray());
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine("[-] ERROR: {0}", e.Message);
-                }
+                System.IO.File.WriteAllLines(outputFilepath, output.ToArray());
             }
             else
             {
@@ -56,21 +47,20 @@ USAGE:
         netstat.exe -S DC01.MGMT.LOCAL
         
         netstat.exe -S DC01.MGMT.LOCAL -U MGMT\Administrator -P password");
-            Console.WriteLine("\nDONE");
         }
         
         public static void Main()
         {
-            string outputFilepath = "";
-            string system = ".";
-            string username = "";
-            string password = "";
-            string protocol = "";
-            
-            // Parse arguments
-            string[] args = Environment.GetCommandLineArgs();
-            
             try {
+                string outputFilepath = "";
+                string system = ".";
+                string username = "";
+                string password = "";
+                string protocol = "";
+            
+                // Parse arguments
+                string[] args = Environment.GetCommandLineArgs();
+                
                 for (int i = 1; i < args.Length; i++)
                 {
                     string arg = args[i];
@@ -79,29 +69,60 @@ USAGE:
                         case "-O":
                         case "/O":
                             i++;
-                            outputFilepath = args[i];
-                            
-                            if (File.Exists(outputFilepath))
+
+                            try
                             {
-                                Console.WriteLine("[-] ERROR: Output file exists");
-                                Console.WriteLine("\nDONE");
-                                return;
+                                outputFilepath = args[i];
+
+                                if (File.Exists(outputFilepath))
+                                {
+                                    throw new ArgumentException("Output file already exists");
+                                }
+                            }
+                            catch (IndexOutOfRangeException)
+                            {
+                                throw new ArgumentException("No output file specified");
                             }
                             break;
                         case "-S":
                         case "/S":
                             i++;
-                            system = args[i];
+
+                            try
+                            {
+                                system = args[i];
+                            }
+                            catch (IndexOutOfRangeException)
+                            {
+                                throw new ArgumentException("No system specified");
+                            }
                             break;
                         case "-U":
                         case "/U":
                             i++;
-                            username = args[i];
+
+                            try
+                            {
+                                username = args[i];
+                            }
+                            catch (IndexOutOfRangeException)
+                            {
+                                throw new ArgumentException("No username specified");
+                            }
+
                             break;
                         case "-P":
                         case "/P":
                             i++;
-                            password = args[i];
+
+                            try
+                            {
+                                password = args[i];
+                            }
+                            catch (IndexOutOfRangeException)
+                            {
+                                throw new ArgumentException("No password specified");
+                            }
                             break;
                         case "/?":
                             PrintUsage();
@@ -110,22 +131,12 @@ USAGE:
                             protocol = args[i].ToUpper();
                             
                             if (!(protocol.Equals("TCP") || protocol.Equals("UDP"))) {
-                                Console.WriteLine("[-] ERROR: Invalid protocol specified");
-                                Console.WriteLine("\nDONE");
-                                return;
+                                throw new ArgumentException("Invalid protocol specified");
                             }
-                            
                             break;
                     }
                 }
-            } catch (IndexOutOfRangeException) {
-                Console.WriteLine("ERROR: Invalid arguments");
-                Console.WriteLine("\nDONE");
-                return;
-            }
-            
-            //try
-            //{
+
                 ConnectionOptions conn_opts = new ConnectionOptions();
                 
                 // Apply username and password if specified
@@ -133,16 +144,14 @@ USAGE:
                     conn_opts.Username = username;
                     conn_opts.Password = password;
                 } else if (username.Length > 0 || password.Length > 0) {
-                    // Error out if username or password were specified, but not both
-                    Console.WriteLine("ERROR: Please specify username and password");
-                    Console.WriteLine("\nDONE");
-                    System.Environment.Exit(1);
+                    // Throw an exception if username or password were specified, but not both
+                    throw new ArgumentException("Please specify username and password");
                 }
                 
                 // Keep track of the max length of each entry in order to dynamically space the columns
                 int localAddrMaxSize = 13;       // Length of "Local Address"
                 int remoteAddrMaxSize = 15;      // Length of "Foreign Address"
-                int stateMaxSize = 5;             // Length of "State"
+                int stateMaxSize = 5;            // Length of "State"
                 int colPadding = 4;
                 Dictionary<string,string> entry;
                 List<Dictionary<string,string>> entries = new List<Dictionary<string,string>>();
@@ -211,7 +220,7 @@ USAGE:
                     }
                 }
                 
-                // Display TCP if it's specified or no protocol was specified
+                // Display UDP if it's specified or no protocol was specified
                 if (protocol.Equals("UDP") || protocol.Equals("")) {
                     // Query for UDP ports; return specified attributes
                     query = new SelectQuery("MSFT_NetUDPEndpoint", null, new string[] { "LocalAddress", "LocalPort", "OwningProcess"});
@@ -245,7 +254,6 @@ USAGE:
                     }
                 }
                 
-                
                 // Add extra padding to separate the columns
                 localAddrMaxSize += colPadding;
                 remoteAddrMaxSize += colPadding;
@@ -278,14 +286,15 @@ USAGE:
                 output.Insert(0, line);
                 
                 WriteOutput(outputFilepath, output);
-            /*}
+            }
             catch (Exception e)
             {
-                Console.WriteLine("[-] ERROR: {0}", e.Message.Trim());
+                Console.Error.WriteLine("[-] ERROR: {0}", e.Message.Trim());
             }
-            */
-            
-            Console.WriteLine("\nDONE");
+            finally
+            {
+                Console.WriteLine("\nDONE");
+            }
         }
     }
 }

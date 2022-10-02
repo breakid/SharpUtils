@@ -4,9 +4,10 @@
 // To Compile:
 //   C:\Windows\Microsoft.NET\Framework\v2.0.50727\csc.exe /t:exe /out:arp.exe arp.cs
 
+
 using System;
 using System.Runtime.InteropServices;
-using System.ComponentModel; 
+using System.ComponentModel;
 using System.Net;
 
 namespace Arp
@@ -61,6 +62,14 @@ namespace Arp
         // The insufficient buffer error.
         const int ERROR_INSUFFICIENT_BUFFER = 122;
 
+        private static void PrintUsage()
+        {
+            Console.WriteLine(@"Dumps a mapping of IP to hardware (MAC) addresses from the Address Resolution Protocol (ARP) cache
+    
+USAGE:
+    arp.exe [/?]");
+        }
+
         static void Main(string[] args)
         {
             // The number of bytes needed.
@@ -69,13 +78,6 @@ namespace Arp
             // The result from the API call.
             int result = GetIpNetTable(IntPtr.Zero, ref bytesNeeded, false);
 
-            // Call the function, expecting an insufficient buffer.
-            if (result != ERROR_INSUFFICIENT_BUFFER)
-            {
-                // Throw an exception.
-                throw new Win32Exception(result);
-            }
-
             // Allocate the memory, do it in a try/finally block, to ensure
             // that it is released.
             IntPtr buffer = IntPtr.Zero;
@@ -83,6 +85,26 @@ namespace Arp
             // Try/finally.
             try
             {
+                // Parse arguments
+                for (int i = 0; i < args.Length; i++)
+                {
+                    string arg = args[i];
+
+                    switch (arg.ToUpper())
+                    {
+                        case "/?":
+                            PrintUsage();
+                            return;
+                    }
+                }
+
+                // Call the function, expecting an insufficient buffer.
+                if (result != ERROR_INSUFFICIENT_BUFFER)
+                {
+                    // Throw an exception.
+                    throw new Win32Exception(result);
+                }
+
                 // Allocate the memory.
                 buffer = Marshal.AllocCoTaskMem(bytesNeeded);
 
@@ -112,11 +134,10 @@ namespace Arp
                 for (int index = 0; index < entries; index++)
                 {
                     // Call PtrToStructure, getting the structure information.
-                    table[index] = (MIB_IPNETROW) Marshal.PtrToStructure(new
+                    table[index] = (MIB_IPNETROW)Marshal.PtrToStructure(new
                         IntPtr(currentBuffer.ToInt64() + (index *
                         Marshal.SizeOf(typeof(MIB_IPNETROW)))), typeof(MIB_IPNETROW));
                 }
-
 
                 Console.WriteLine("\n  Internet Address      Physical Address      Type");
 
@@ -124,7 +145,7 @@ namespace Arp
                 {
                     MIB_IPNETROW row = table[index];
                     IPAddress ip = new IPAddress(BitConverter.GetBytes(row.dwAddr));
-                    
+
                     string[] mac_arr = {
                       row.mac0.ToString("X2"),
                       row.mac1.ToString("X2"),
@@ -133,29 +154,34 @@ namespace Arp
                       row.mac4.ToString("X2"),
                       row.mac5.ToString("X2")
                     };
-                    
+
                     string ip_str = String.Format("{0,-22}", ip.ToString());
                     string mac_str = String.Format("{0,-22}", string.Join("-", mac_arr));
                     string type = "static";
-                    
-                    if (mac_str == "00-00-00-00-00-00      ") {
-                      continue;
+
+                    if (mac_str == "00-00-00-00-00-00      ")
+                    {
+                        continue;
                     }
-                    
-                    if (row.dwType == 3) {
-                      type = "dynamic";
+
+                    if (row.dwType == 3)
+                    {
+                        type = "dynamic";
                     }
-                    
+
                     Console.WriteLine("  " + ip_str + mac_str + type);
                 }
+            }
+            catch (Exception e)
+            {
+                Console.Error.WriteLine("[-] ERROR: {0}", e.Message.Trim());
             }
             finally
             {
                 // Release the memory.
                 FreeMibTable(buffer);
+                Console.WriteLine("\nDONE");
             }
-            
-            Console.WriteLine("\nDONE");
         }
     }
 }

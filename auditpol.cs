@@ -3,6 +3,7 @@
 // To Compile:
 //   C:\Windows\Microsoft.NET\Framework\v2.0.50727\csc.exe /t:exe /out:auditpol.exe auditpol.cs
 
+
 using System;
 using System.Collections.Specialized;
 using System.ComponentModel;
@@ -14,33 +15,73 @@ using System.Text;
 /// </summary>
 public class AdvancedAuditPolicyWrapper
 {
+    private static void PrintUsage()
+    {
+        Console.WriteLine(@"Enumerates the audit policy configuration of the current host. Requires administrative privileges.
+    
+USAGE:
+    auditpol.exe [/?]");
+    }
+
     public static void Main(string[] args)
     {
-        string auditInfo;
-        
-        Console.WriteLine("System audit policy");
-        Console.WriteLine("Category/Subcategory                      Setting");
-        
-        foreach (string category_guid_str in GetCategoryIdentifiers()) {
-            Console.WriteLine(GetCategoryDisplayName(category_guid_str));
-            
-            foreach (string subcat_guid_str in GetSubCategoryIdentifiers(category_guid_str)) {
-                Console.Write("    " + String.Format("{0,-40}", GetSubCategoryDisplayName(subcat_guid_str)));
-                
-                auditInfo = GetSystemPolicy(subcat_guid_str).AuditingInformation.ToString();
-                
-                // Post-process to make the output match the native tool
-                if (auditInfo == "None") {
-                    auditInfo = "No Auditing";
+        try
+        {
+            // Parse arguments
+            for (int i = 0; i < args.Length; i++)
+            {
+                string arg = args[i];
+
+                switch (arg.ToUpper())
+                {
+                    case "/?":
+                        PrintUsage();
+                        return;
                 }
-                
-                auditInfo = auditInfo.Replace(", ", " and ");
-                
-                Console.WriteLine(auditInfo);
+            }
+
+            string auditInfo;
+
+            Console.WriteLine("System audit policy");
+            Console.WriteLine("Category/Subcategory                      Setting");
+
+            foreach (string category_guid_str in GetCategoryIdentifiers())
+            {
+                Console.WriteLine(GetCategoryDisplayName(category_guid_str));
+
+                foreach (string subcat_guid_str in GetSubCategoryIdentifiers(category_guid_str))
+                {
+                    Console.Write("    " + String.Format("{0,-40}", GetSubCategoryDisplayName(subcat_guid_str)));
+
+                    try
+                    {
+                        auditInfo = GetSystemPolicy(subcat_guid_str).AuditingInformation.ToString();
+
+                        // Post-process to make the output match the native tool
+                        if (auditInfo == "None")
+                        {
+                            auditInfo = "No Auditing";
+                        }
+
+                        auditInfo = auditInfo.Replace(", ", " and ");
+
+                        Console.WriteLine(auditInfo);
+                    }
+                    catch (Exception e)
+                    {
+                        Console.Error.WriteLine(e.Message.Trim());
+                    }
+                }
             }
         }
-        
-        Console.WriteLine("\nDONE");
+        catch (Exception e)
+        {
+            Console.Error.WriteLine(e.Message.Trim());
+        }
+        finally
+        {
+            Console.WriteLine("\nDONE");
+        }
     }
 
     /// <summary>
@@ -161,8 +202,9 @@ public class AdvancedAuditPolicyWrapper
         StringBuilder buffer = new StringBuilder();
         bool success = AuditLookupCategoryName(ref guid, out buffer);
         if (!success) { throw new Win32Exception(Marshal.GetLastWin32Error()); }
-        if (buffer == null) { 
-            throw new ArgumentException(String.Format("Category Display Name Not Found for {0}", guid)); 
+        if (buffer == null)
+        {
+            throw new ArgumentException(String.Format("Category Display Name Not Found for {0}", guid));
         }
         String categoryDisplayName = buffer.ToString();
         buffer = null;
@@ -254,15 +296,16 @@ public class AdvancedAuditPolicyWrapper
         bool success = AuditQuerySystemPolicy(subCategoryGuid, 1, out buffer);
         if (!success) { throw new Win32Exception(Marshal.GetLastWin32Error()); }
         AUDIT_POLICY_INFORMATION policyInformation = new AUDIT_POLICY_INFORMATION();
-        try {
+        try
+        {
             policyInformation = (AUDIT_POLICY_INFORMATION)Marshal.PtrToStructure(buffer, typeof(AUDIT_POLICY_INFORMATION));
             AuditFree(buffer);
         }
         catch
         {
-            Console.WriteLine("\n\nERROR 5: Insufficient privileges");
-            Environment.Exit(1);
+            throw new Exception("ERROR 5: Insufficient privileges");
         }
+
         return policyInformation;
     }
 }

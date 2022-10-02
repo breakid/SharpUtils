@@ -20,178 +20,187 @@ using System.Net;
  * ==================================================================================== */
 
 
-namespace FarmDNS
+public class Program
 {
-    public class Program
+    public static IEnumerable<string> GetIPRange(IPAddress startIP, IPAddress endIP)
     {
-        public static IEnumerable<string> GetIPRange(IPAddress startIP, IPAddress endIP)
+        uint sIP = ipToUint(startIP.GetAddressBytes());
+        uint eIP = ipToUint(endIP.GetAddressBytes());
+
+        while (sIP <= eIP)
         {
-            uint sIP = ipToUint(startIP.GetAddressBytes());
-            uint eIP = ipToUint(endIP.GetAddressBytes());
-            
-            while (sIP <= eIP)
-            {
-                yield return new IPAddress(reverseBytesArray(sIP)).ToString();
-                sIP++;
-            }
+            yield return new IPAddress(reverseBytesArray(sIP)).ToString();
+            sIP++;
         }
+    }
 
 
-        /* reverse byte order in array */
-        protected static uint reverseBytesArray(uint ip)
+    /* reverse byte order in array */
+    protected static uint reverseBytesArray(uint ip)
+    {
+        byte[] bytes = BitConverter.GetBytes(ip);
+        bytes = bytes.Reverse().ToArray();
+        return (uint)BitConverter.ToInt32(bytes, 0);
+    }
+
+
+    /* Convert bytes array to 32 bit long value */
+    protected static uint ipToUint(byte[] ipBytes)
+    {
+        ByteConverter bConvert = new ByteConverter();
+        uint ipUint = 0;
+
+        int shift = 24; // indicates number of bits left for shifting
+        foreach (byte b in ipBytes)
         {
-            byte[] bytes = BitConverter.GetBytes(ip);
-            bytes = bytes.Reverse().ToArray();
-            return (uint)BitConverter.ToInt32(bytes, 0);
-        }
-
-
-        /* Convert bytes array to 32 bit long value */
-        protected static uint ipToUint(byte[] ipBytes)
-        {
-            ByteConverter bConvert = new ByteConverter();
-            uint ipUint = 0;
-
-            int shift = 24; // indicates number of bits left for shifting
-            foreach (byte b in ipBytes)
+            if (ipUint == 0)
             {
-                if (ipUint == 0)
-                {
-                    ipUint = (uint)bConvert.ConvertTo(b, typeof(uint)) << shift;
-                    shift -= 8;
-                    continue;
-                }
-
-                if (shift >= 8)
-                    ipUint += (uint)bConvert.ConvertTo(b, typeof(uint)) << shift;
-                else
-                    ipUint += (uint)bConvert.ConvertTo(b, typeof(uint));
-
+                ipUint = (uint)bConvert.ConvertTo(b, typeof(uint)) << shift;
                 shift -= 8;
+                continue;
             }
 
-            return ipUint;
+            if (shift >= 8)
+                ipUint += (uint)bConvert.ConvertTo(b, typeof(uint)) << shift;
+            else
+                ipUint += (uint)bConvert.ConvertTo(b, typeof(uint));
+
+            shift -= 8;
         }
-        
-        
-        public static IPAddress ParseIP(string ip)
+
+        return ipUint;
+    }
+
+
+    public static IPAddress ParseIP(string ip)
+    {
+        try
         {
-            try
-            {
-                return IPAddress.Parse(ip);
-            }
-            catch
-            {
-                Console.WriteLine("[-] ERROR: {0} is not a valid IP address", ip);
-                System.Environment.Exit(1);
-            }
-            
-            return null;
+            return IPAddress.Parse(ip);
         }
-        
-        
-        protected static void GetHostname(string ip)
+        catch
         {
-            Console.WriteLine(ip);
-            
-            try
+            throw new ArgumentException(String.Format("{0} is not a valid IP address", ip));
+        }
+    }
+
+
+    protected static void GetHostname(string ip)
+    {
+        Console.WriteLine(ip);
+
+        try
+        {
+            IPAddress ipAddr = ParseIP(ip);
+            IPHostEntry hostInfo = Dns.GetHostEntry(ipAddr);
+
+            Console.WriteLine("  Hostname: {0}", hostInfo.HostName);
+
+            // Get the IP address list that resolves to the host names contained in
+            // the Alias property.
+            IPAddress[] address = hostInfo.AddressList;
+
+            // Get the alias names of the addresses in the IP address list.
+            String[] aliases = hostInfo.Aliases;
+
+            if (aliases.Length > 0)
             {
-                IPAddress ipAddr = ParseIP(ip);
-                IPHostEntry hostInfo = Dns.GetHostEntry(ipAddr);
-                
-                Console.WriteLine("  Hostname: {0}", hostInfo.HostName);
-                
-                // Get the IP address list that resolves to the host names contained in
-                // the Alias property.
-                IPAddress[] address = hostInfo.AddressList;
-                
-                // Get the alias names of the addresses in the IP address list.
-                String[] aliases = hostInfo.Aliases;
-                
-                if (aliases.Length > 0)
+                Console.WriteLine("  Aliases:");
+                for (int index = 0; index < aliases.Length; index++)
                 {
-                    Console.WriteLine("  Aliases:");
-                    for (int index = 0; index < aliases.Length; index++)
-                    {
-                      Console.WriteLine("    {0}", aliases[index]);
-                    }
+                    Console.WriteLine("    {0}", aliases[index]);
                 }
-                
-                if (address.Length > 1)
-                {
-                    Console.WriteLine("\n  Other IPs:");
-                    for (int index = 0; index < address.Length; index++)
-                    {
-                       Console.WriteLine("    {0}", address[index]);
-                    }
-                }
-                
-                // Create a new line to separate IPs
-                Console.WriteLine("");
             }
-            catch(Exception e)
+
+            if (address.Length > 1)
             {
-                Console.WriteLine("  [-] ERROR: {0}", e.Message);
+                Console.WriteLine("\n  Other IPs:");
+                for (int index = 0; index < address.Length; index++)
+                {
+                    Console.WriteLine("    {0}", address[index]);
+                }
             }
+
+            // Create a new line to separate IPs
+            Console.WriteLine("");
         }
-        
-        private static void PrintUsage()
+        catch (Exception e)
         {
-            Console.WriteLine(@"Performs reverse DNS lookups on the specified range of IP addresses (IPv4 only)
+            Console.Error.WriteLine("  [-] ERROR: {0}", e.Message.Trim());
+        }
+    }
+
+    private static void PrintUsage()
+    {
+        Console.WriteLine(@"Performs reverse DNS lookups on the specified range of IP addresses (IPv4 only)
     
-    USAGE:
-        farm_dns.exe [/T <seconds_to_sleep>] <start_IP> <end_IP>");
-            Console.WriteLine("\nDONE");
-        }
-        
-        public static void Main(string[] args)
+USAGE:
+    farm_dns.exe [/T <seconds_to_sleep>] <start_IP> <end_IP> [/?]");
+    }
+
+    public static void Main(string[] args)
+    {
+        try
         {
             if (args.Length >= 2)
             {
                 int throttle = 0;
                 IPAddress start = null;
                 IPAddress end = null;
-                
+
                 // Parse arguments
                 for (int i = 0; i < args.Length; i++)
                 {
                     string arg = args[i];
-                    
-                    switch (arg.ToUpper()) {
+
+                    switch (arg.ToUpper())
+                    {
                         case "-T":
                         case "/T":
                             i++;
-                            
-                            // Catch error while attempting to parse the throttle time to prevent exception
-                            if (int.TryParse(args[i], out throttle) == false)
+
+                            try
                             {
-                                Console.Error.WriteLine("ERROR: Invalid throttle");
-                                Console.WriteLine("\nDONE");
-                                return;
+                                // Catch error while attempting to parse the throttle time to prevent exception
+                                if (int.TryParse(args[i], out throttle) == false)
+                                {
+                                    throw new ArgumentException("Invalid throttle");
+                                }
+                            }
+                            catch (IndexOutOfRangeException)
+                            {
+                                throw new ArgumentException("No throttle specified");
                             }
                             break;
                         case "/?":
                             PrintUsage();
                             return;
                         default:
-                            start = ParseIP(args[i++]);
-                            
-                            if (i < args.Length)
+                            try
                             {
-                                end = ParseIP(args[i]);
+                                start = ParseIP(args[i++]);
+
+                                if (i < args.Length)
+                                {
+                                    end = ParseIP(args[i]);
+                                }
+                            }
+                            catch (Exception e)
+                            {
+                                throw new ArgumentException("Invalid start or end value");
                             }
                             break;
                     }
                 }
-                
+
                 if (start != null && end != null)
                 {
                     Console.WriteLine("[*] Farming IPs from: {0} to {1}", start, end);
-                    
+
                     foreach (string ip in GetIPRange(start, end))
                     {
                         GetHostname(ip);
-                        
+
                         // Sleep for throttle seconds
                         if (throttle > 0)
                         {
@@ -201,14 +210,20 @@ namespace FarmDNS
                 }
                 else
                 {
-                    Console.Error.WriteLine("ERROR: Start and/or end address not specified");
+                    throw new Exception("Start and/or end address not specified");
                 }
-                
-                Console.WriteLine("\nDONE");
                 return;
             }
-            
+
             PrintUsage();
+        }
+        catch (Exception e)
+        {
+            Console.Error.WriteLine("[-] ERROR: {0}", e.Message.Trim());
+        }
+        finally
+        {
+            Console.WriteLine("\nDONE");
         }
     }
 }

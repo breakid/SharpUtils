@@ -18,7 +18,7 @@ I opted to use the C# Command-Line Compiler (csc.exe) instead of Visual Studio t
 Displays cached mappings between IP addresses and MAC addresses
 
 #### Usage
-    arp.exe
+    arp.exe [/?]
 
 
 
@@ -28,7 +28,7 @@ Displays the computer's auditing policy (i.e., what actions will be logged)
 **Requires administrative privileges**
 
 #### Usage
-    auditpol.exe
+    auditpol.exe [/?]
 
 
 
@@ -87,7 +87,7 @@ Displays info about installed drivers. Name and signer are displayed by default;
 **Uses WMI**
 
 #### Usage
-    driver_list.exe [/V | /VV]
+    driver_list.exe [/V | /VV] [/?]
 
 
 
@@ -101,7 +101,7 @@ Users can optionally specify an output file using "/o"; if omitted, output will 
 Since it queries Active Directory, it may need to be run using domain user credentials (non-privileged will suffice). If necessary and missing, a "[-] ERROR: The user name or password is incorrect." message will be displayed.
 
 #### Usage
-    dump_dns.exe [/S <dns_server>] [/D <domain_name>] [/F <forest_name>] [/T] [/O <output_filepath>]
+    dump_dns.exe [/S <dns_server>] [/D <domain_name>] [/F <forest_name>] [/T] [/O <output_filepath>] [/?]
     
     /T    Optionally include tombstoned values
 
@@ -111,7 +111,7 @@ Since it queries Active Directory, it may need to be run using domain user crede
 Displays environment variables (in alphabetical order)
 
 #### Usage
-    env.exe
+    env.exe [/?]
 
 
 
@@ -119,7 +119,7 @@ Displays environment variables (in alphabetical order)
 Reads events from the specified log file; optionally limit by EventID and number of events returned
 
 #### Usage
-    eventlog.exe <log name> [/C <count>] [/E <event IDs (comma-separated, no space)>]
+    eventlog.exe <log name> [/C <count>] [/E <event IDs (comma-separated, no space)>] [/?]
 
 
 
@@ -127,7 +127,7 @@ Reads events from the specified log file; optionally limit by EventID and number
 Performs reverse DNS lookups on the specified range of IP addresses (IPv4 only). Opted to remove the output file support from the original design because all data was written at the end; if a user choose to end the farming early all data would be lost. Writing to STDOUT in real-time allows a user to end the farming and resume later with the IP address where they left off without losing any data.
 
 #### Usage
-    farm_dns.exe <start_IP> <end_IP>
+    farm_dns.exe [/T <seconds_to_sleep>] <start_IP> <end_IP> [/?]
 
 
 
@@ -135,23 +135,25 @@ Performs reverse DNS lookups on the specified range of IP addresses (IPv4 only).
 Lists logical drives, including total and available free space. Mapped drives will only be shown when freespace.exe is run within the same session or with the same credentials used to map the drive.
 
 #### Usage
-    freespace.exe
+    freespace.exe [/?]
 
 
 
 ### get_chrome_tab_info.exe
 Displays the URL of the current tab and the titles of all tabs in foremost Chrome window. Will NOT display information about other Chrome windows.
 
+**Currently Broken**
+
 #### Usage
-    get_chrome_tab_info.exe
+    get_chrome_tab_info.exe [/?]
 
 
 
-### get_chrome_tab_info.exe
+### get_hotfix.exe
 Lists patches, optionally including verbose information such as Description, InstalledBy, and InstalledOn.
 
 #### Usage
-    get_hotfix.exe [/S <system>] [/U [<domain>\]<username> /P <password>] [/V]
+    get_hotfix.exe [/S <system>] [/U [<domain>\]<username> /P <password>] [/V] [/?]
 
 
 
@@ -159,7 +161,7 @@ Lists patches, optionally including verbose information such as Description, Ins
 Displays permissions, grouped by user/group, for each file or directory specified
 
 #### Usage
-    icacls.exe <file_or_directory> <...>
+    icacls.exe <file_or_directory> [...] [/?]
 
 
 
@@ -170,7 +172,7 @@ Lists logical drives (using WMI), including total and available free space. Mapp
 **Requires administrative privileges when used against a remote host**
 
 #### Usage
-    lld.exe [system]
+    lld.exe [system] [/?]
 
 
 
@@ -180,7 +182,7 @@ Lists listening TCP and UDP ports, and active TCP connections (equivalent to 'ne
 **Uses WMI**
 
 #### Usage
-    netstat.exe [/S <system> [/U [<domain>\]<username> /P <password>]] [/O <output_filepath>] [TCP | UDP]
+    netstat.exe [/S <system> [/U [<domain>\]<username> /P <password>]] [/O <output_filepath>] [TCP | UDP] [/?]
 
 #### Examples
     netstat.exe
@@ -205,7 +207,7 @@ The `Proxy` header will always show in the printed output; however, if the value
 The `-v` flag causes the HTML contents of the page to be printed; if omitted, only the response headers will be shown. 
 
 #### Usage
-    pagegrab.exe [-p http(s)://<proxy>:<proxy_port>] [-m <method>] [-d <URL encoded POST data>] [-h <header_1_name> <header_1_value> [-h <header_2_name> <header_2_value>]] [-v] <URL>
+    pagegrab.exe [-p http(s)://<proxy>:<proxy_port>] [-m <method>] [-d <URL encoded POST data>] [-h <header_1_name> <header_1_value> [-h <header_2_name> <header_2_value>]] [-v] <URL> [/?]
       -v  Print the HTML contents of the response
 
 #### Examples
@@ -229,7 +231,7 @@ The `-v` flag causes the HTML contents of the page to be printed; if omitted, on
 Read the contents of a file; optionally limit to X number of lines from the beginning of the file or Y number of lines from the end
 
 #### Usage
-    readfile.exe [+X] [-Y] <path_to_file>
+    readfile.exe [+X] [-Y] <path_to_file> [/?]
 
 
 
@@ -239,7 +241,7 @@ Lists processes, their PIDs, and their associated services (if applicable)
 **Uses WMI**
 
 #### Usage
-    tasklist_svc.exe
+    tasklist_svc.exe [/?]
 
 
 
@@ -255,7 +257,7 @@ Verbose mode (/V) will return the user name under which the process is running; 
 **Requires administrative privileges if used against a remote host and for some local tasks (i.e., retrieving user context for processes owned by other users)**
 
 #### Usage
-    tasklist_wmi.exe [/S <system> [/U [<domain>\]<username> /P <password>]] [ [/PID <processid> | /IM <imagename> | /FI <"WQL where clause">] ] [/V] [/D "<delimiter>"]
+    tasklist_wmi.exe [/S <system> [/U [<domain>\]<username> /P <password>]] [ [/PID <processid> | /IM <imagename> | /FI <"WQL where clause">] ] [/V] [/D "<delimiter>"] [/?]
 
 #### Examples
     tasklist_wmi.exe /v
@@ -275,7 +277,7 @@ Kills one or more processes by PID or imagename; multiple PIDs should be provide
 **Requires administrative privileges if used against a remote host and for some local tasks (i.e., killing processes with a different owner)**
 
 #### Usage
-    taskkill.exe [/S <system> [/U [<domain>\]<username> /P <password>]] { [/PID <processid> | /IM <imagename>] }
+    taskkill.exe [/S <system> [/U [<domain>\]<username> /P <password>]] { [/PID <processid> | /IM <imagename>] } [/?]
 
 #### Examples
     taskkill.exe /PID 964
@@ -294,7 +296,7 @@ Authenticates against the specified Active Directory (AD) domain using the provi
 **This WILL create a failed logon event if the credentials are not valid; use sparingly to avoid account lockout**
 
 #### Usage
-    test_ad_creds.exe [/S <server>] <domain> <username> <password>
+    test_ad_creds.exe [/S <server>] <domain> <username> <password> [/?]
 
 
 
@@ -304,7 +306,7 @@ Displays a list of visible windows and their associated process.
 **BETA: Has only been tested locally under Medium and High Integrity accounts. SYSTEM-level access *may* provide information from multiple sessions, and remote access *may* provide results (initial testing resulted in "Network path not found" errors)**
 
 #### Usage
-    window_list.exe [/S <host>]
+    window_list.exe [/S <host>] [/?]
 
 
 
@@ -314,7 +316,7 @@ Runs the specified WMI query and displays properties in key-value pairs. The que
 **Uses WMI** (...obviously)
 
 #### Usage
-    wmi_query.exe [/S <system> [/U [<domain>\]<username> /P <password>]] [-N <namespace>] [/O <output_filepath>] [/V] "<wmi_query>"
+    wmi_query.exe [/S <system> [/U [<domain>\]<username> /P <password>]] [-N <namespace>] [/O <output_filepath>] [/V] "<wmi_query>" [/?]
 
 #### Examples
     wmi_query.exe "Select * from win32_process"
