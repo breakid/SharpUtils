@@ -18,6 +18,10 @@ using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
 
+// Needed for SSL / TLS certificate support
+using System.Security.Cryptography;
+using System.Security.Cryptography.X509Certificates;
+
 public class PageGrab
 {
     public static int Main(string[] args)
@@ -27,8 +31,9 @@ public class PageGrab
             if (args.Length == 0 || (args.Length > 0 && args[0] == "/?"))
             {
                 // Print usage
-                Console.WriteLine(@"USAGE: pagegrab.exe [-p http(s)://<proxy>:<proxy_port>] [-m <method>] [-d <URL encoded POST data>] [-h <header_1_name> <header_1_value> [-h <header_2_name> <header_2_value>]] [-v] <URL> [/?]
+                Console.WriteLine(@"USAGE: pagegrab.exe [-p http(s)://<proxy>:<proxy_port>] [-m <method>] [-d <URL encoded POST data>] [-h <header_1_name> <header_1_value> [-h <header_2_name> <header_2_value>]] [-c] [-v] <URL> [/?]
             
+    -c  Display the SSL / TLS certificate
     -v  Print the HTML contents of the response");
                 return 0;
             }
@@ -39,6 +44,7 @@ public class PageGrab
             string proxyAddress = "";
             string method = "GET";
             string postData = "";
+            bool displaySSLCert = false;
             bool verbose = false;
             Dictionary<string, string> headers = new Dictionary<string, string>();
 
@@ -54,6 +60,10 @@ public class PageGrab
 
                 switch (arg.ToUpper())
                 {
+                    case "-C": // Display SSL / TLS certificate
+                        displaySSLCert = true;
+                        break;
+                    
                     case "-D": // POST data
                         i++;
 
@@ -127,7 +137,7 @@ public class PageGrab
                         }
 
                         break;
-
+                    
                     case "-Q": // Query user agent
                         Console.WriteLine("[*] INFO: Edge version: " + edgeVersion);
                         return 0;
@@ -287,7 +297,7 @@ public class PageGrab
                 HttpWebResponse response = (HttpWebResponse)request.GetResponse();
 
                 // Display the status and headers
-                Console.WriteLine("Status: " + response.StatusDescription + "\n");
+                Console.WriteLine("Status: " + response.StatusDescription, Environment.NewLine);
                 Console.WriteLine(response.Headers);
 
                 // Optionally print the HTML from the response
@@ -310,6 +320,25 @@ public class PageGrab
                 }
 
                 response.Close();
+
+                if (displaySSLCert) {
+                    X509Certificate cert = request.ServicePoint.Certificate;
+
+                    Console.WriteLine("SSL / TLS Certificate");
+                    Console.WriteLine("---------------------");
+                    Console.WriteLine("  Subject:           " + cert.Subject);
+                    Console.WriteLine("  Issuer:            " + cert.Issuer);
+                    Console.WriteLine("  Valid From:        " + cert.GetEffectiveDateString());
+                    Console.WriteLine("  Valid To:          " + cert.GetExpirationDateString());
+                    Console.WriteLine("  Serial Number:     " + cert.GetSerialNumberString());
+                    Console.WriteLine("  SHA-1 Fingerprint: " + cert.GetCertHashString());
+                    Console.WriteLine("  Public Key:        " + cert.GetPublicKeyString());
+                    Console.WriteLine("");
+                    Console.WriteLine("Certificate PEM:");
+                    Console.WriteLine("----BEGIN CERTIFICATE----");
+                    Console.WriteLine(System.Convert.ToBase64String(cert.GetRawCertData()));
+                    Console.WriteLine("----END CERTIFICATE----");
+                }
             }
             else
             {
