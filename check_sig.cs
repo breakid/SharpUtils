@@ -18,6 +18,7 @@ internal class CheckSign
 USAGE:
     check_sig <full_path_to_exe/dll_on_host> [/?]");
     }
+	
     private static void Main(string[] args)
     {
         try
@@ -38,7 +39,8 @@ USAGE:
             }
 
             // Check if File was supplied
-            string filePath = args[0];
+            string filePath = string.Join(" ", args);
+			Console.WriteLine("[+] [CheckSign] " + filePath);
             if (!File.Exists(filePath))
             {
                 Console.WriteLine("[-] [CheckSign] File not found");
