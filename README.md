@@ -56,6 +56,27 @@ Checks whether an EXE/DLL is signed and, if so, validates the signature.
 check_sig.exe [/online] <path_to_exe/dll> [...] [/?]
 ```
 
+#### Examples
+
+```text
+PS> .\check_sig_4.0.exe "C:\Program Files\Google\Chrome\Application\chrome.exe" "C:\Windows\System32\cmd.exe"
+[*] [CheckSign] Checking 2 files
+
+[*] [CheckSign] File 1: C:\Program Files\Google\Chrome\Application\chrome.exe
+    [*] Digital signature found
+        Publisher  : CN=Google LLC, O=Google LLC, L=Mountain View, S=California, C=US
+        Valid From : 7/1/2021 20:00:00 PM
+        Valid To   : 7/10/2024 19:59:59 PM
+        Issued By  : CN=DigiCert Trusted G4 Code Signing RSA4096 SHA384 2021 CA1, O="DigiCert, Inc.", C=US
+    [+] Signature valid!
+
+[*] [CheckSign] File 2: C:\Windows\System32\cmd.exe
+    [-] [CheckSign] No digital signature found!
+
+
+DONE
+```
+
 ---
 
 ### create_process.exe
