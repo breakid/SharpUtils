@@ -13,6 +13,9 @@ C:\Windows\Microsoft.NET\Framework\v2.0.50727\csc.exe /t:exe /out:bin\auditpol_2
 C:\Windows\Microsoft.NET\Framework\v3.5\csc.exe /t:exe /out:bin\auditpol_3.5.exe auditpol.cs | Select-String error
 C:\Windows\Microsoft.NET\Framework\v4.0.30319\csc.exe /t:exe /out:bin\auditpol_4.0.exe auditpol.cs | Select-String error
 
+Write-Output "  [*] check_sig.exe"
+C:\Windows\Microsoft.NET\Framework\v4.0.30319\csc.exe /t:exe /out:bin\check_sig_4.0.exe check_sig.cs | Select-String error
+
 Write-Output "  [*] create_process.exe"
 C:\Windows\Microsoft.NET\Framework\v3.5\csc.exe /t:exe /out:bin\create_process_3.5.exe create_process.cs | Select-String error
 C:\Windows\Microsoft.NET\Framework\v4.0.30319\csc.exe /t:exe /out:bin\create_process_4.0.exe create_process.cs | Select-String error

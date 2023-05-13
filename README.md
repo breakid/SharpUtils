@@ -42,6 +42,14 @@ Displays the computer's auditing policy (i.e., what actions will be logged)
 
 ---
 
+### check_sig.exe
+Displays if a file (EXE/DLL) has a Digital Signature, and Chain Information (if Available)
+
+#### Usage
+    check_sig.exe <full_path_to_exe_on_host> [/?]
+
+
+
 ### create_process.exe
 
 Uses WMI to execute a command on the specified remote host
