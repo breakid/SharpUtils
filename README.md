@@ -26,7 +26,9 @@ Displays cached mappings between IP addresses and MAC addresses
 
 #### Usage
 
-    arp.exe [/?]
+```powershell
+arp.exe [/?]
+```
 
 ---
 
@@ -38,17 +40,23 @@ Displays the computer's auditing policy (i.e., what actions will be logged)
 
 #### Usage
 
-    auditpol.exe [/?]
+```powershell
+auditpol.exe [/?]
+```
 
 ---
 
 ### check_sig.exe
-Displays if a file (EXE/DLL) has a Digital Signature, and Chain Information (if Available)
+
+Checks whether an EXE/DLL is signed and, if so, validates the signature.
 
 #### Usage
-    check_sig.exe <full_path_to_exe_on_host> [/?]
 
+```powershell
+check_sig.exe [/online] <path_to_exe/dll> [...] [/?]
+```
 
+---
 
 ### create_process.exe
 
@@ -60,7 +68,9 @@ Uses WMI to execute a command on the specified remote host
 
 #### Usage
 
-    create_process.exe <host> <full_path_to_exe_on_remote_host> <executable_arguments>
+```powershell
+create_process.exe <host> <full_path_to_exe_on_remote_host> <executable_arguments>
+```
 
 ---
 
@@ -82,24 +92,26 @@ This can be run **without administrative privileges from any system that can com
 
 #### Usage
 
-    dsquery * [startNode] -filter <filter_string> [-attr <attributes>] [-limit <number>] [-c | -l | -t] [[-s <server>] | [-d <domain>]] [-u <UserName>] [-p <password>] [-b <buffer_size_in_MB>] [-o <output_file>] [/?]
-    
-        [startNode]             Optional start node (e.g., specific OU; forestroot and domainroot 
-                                are NOT supported at this time)
-        -filter <filter>        Standard dsquery filter string
-        -attr <attributes>      Space-delimited list of attributes; use '*' to return all attributes
-                                If omitted, defaults to '-attr *'
-        -limit <number>         Limits query to <number> records
-        -c                      Count only; prints the number of records returned by a search and exits
-        -l                      Print in list format
-        -t                      Print in table format with ASCII borders around each cell
-        -s <server>             Query the specified server
-        -d <domain>             Query the specified domain
-        -u <username>           Authenticate using the specified username
-        -p <password>           Authenticate using the specified password
-        -o <output_filepath>    Write output to the specified file; will not overwrite an existing file
-        -b <buffer_size>        Write to output file in 'buffer_size' chunks (specified in MB)
-        /?                      Prints help
+```powershell
+dsquery * [startNode] -filter <filter_string> [-attr <attributes>] [-limit <number>] [-c | -l | -t] [[-s <server>] | [-d <domain>]] [-u <UserName>] [-p <password>] [-b <buffer_size_in_MB>] [-o <output_file>] [/?]
+
+    [startNode]             Optional start node (e.g., specific OU; forestroot and domainroot
+                            are NOT supported at this time)
+    -filter <filter>        Standard dsquery filter string
+    -attr <attributes>      Space-delimited list of attributes; use '*' to return all attributes
+                            If omitted, defaults to '-attr *'
+    -limit <number>         Limits query to <number> records
+    -c                      Count only; prints the number of records returned by a search and exits
+    -l                      Print in list format
+    -t                      Print in table format with ASCII borders around each cell
+    -s <server>             Query the specified server
+    -d <domain>             Query the specified domain
+    -u <username>           Authenticate using the specified username
+    -p <password>           Authenticate using the specified password
+    -o <output_filepath>    Write output to the specified file; will not overwrite an existing file
+    -b <buffer_size>        Write to output file in 'buffer_size' chunks (specified in MB)
+    /?                      Prints help
+```
 
 ---
 
@@ -111,7 +123,9 @@ Displays info about installed drivers. Name and signer are displayed by default;
 
 #### Usage
 
-    driver_list.exe [/V | /VV] [/?]
+```powershell
+driver_list.exe [/V | /VV] [/?]
+```
 
 ---
 
@@ -127,9 +141,11 @@ Since it queries Active Directory, it may need to be run using domain user crede
 
 #### Usage
 
-    dump_dns.exe [/S <dns_server>] [/D <domain_name>] [/F <forest_name>] [/T] [/O <output_filepath>] [/?]
-    
+```powershell
+dump_dns.exe [/S <dns_server>] [/D <domain_name>] [/F <forest_name>] [/T] [/O <output_filepath>] [/?]
+
     /T    Optionally include tombstoned values
+```
 
 ---
 
@@ -139,7 +155,9 @@ Displays environment variables (in alphabetical order)
 
 #### Usage
 
-    env.exe [/?]
+```powershell
+env.exe [/?]
+```
 
 ---
 
@@ -149,7 +167,9 @@ Reads events from the specified log file; optionally limit by EventID and number
 
 #### Usage
 
-    eventlog.exe <log name> [/C <count>] [/E <event IDs (comma-separated, no space)>] [/?]
+```powershell
+eventlog.exe <log name> [/C <count>] [/E <event IDs (comma-separated, no space)>] [/?]
+```
 
 ---
 
@@ -159,7 +179,9 @@ Performs reverse DNS lookups on the specified range of IP addresses (IPv4 only).
 
 #### Usage
 
-    farm_dns.exe [/T <seconds_to_sleep>] <start_IP> <end_IP> [/?]
+```powershell
+farm_dns.exe [/T <seconds_to_sleep>] <start_IP> <end_IP> [/?]
+```
 
 ---
 
@@ -169,7 +191,9 @@ Lists logical drives, including total and available free space. Mapped drives wi
 
 #### Usage
 
-    freespace.exe [/?]
+```powershell
+freespace.exe [/?]
+```
 
 ---
 
@@ -181,7 +205,9 @@ Displays the URL of the current tab and the titles of all tabs in foremost Chrom
 
 #### Usage
 
-    get_chrome_tab_info.exe [/?]
+```powershell
+get_chrome_tab_info.exe [/?]
+```
 
 ---
 
@@ -191,7 +217,9 @@ Lists patches, optionally including verbose information such as Description, Ins
 
 #### Usage
 
-    get_hotfix.exe [/S <system>] [/U [<domain>\]<username> /P <password>] [/V] [/?]
+```powershell
+get_hotfix.exe [/S <system>] [/U [<domain>\]<username> /P <password>] [/V] [/?]
+```
 
 ---
 
@@ -201,7 +229,9 @@ Displays permissions, grouped by user/group, for each file or directory specifie
 
 #### Usage
 
-    icacls.exe <file_or_directory> [...] [/?]
+```powershell
+icacls.exe <file_or_directory> [...] [/?]
+```
 
 ---
 
@@ -214,7 +244,9 @@ Lists logical drives (using WMI), including total and available free space. Mapp
 
 #### Usage
 
-    lld.exe [system] [/?]
+```powershell
+lld.exe [system] [/?]
+```
 
 ---
 
@@ -226,17 +258,21 @@ Lists listening TCP and UDP ports, and active TCP connections (equivalent to `ne
 
 #### Usage
 
-    netstat.exe [/S <system> [/U [<domain>\]<username> /P <password>]] [/O <output_filepath>] [TCP | UDP] [/?]
+```powershell
+netstat.exe [/S <system> [/U [<domain>\]<username> /P <password>]] [/O <output_filepath>] [TCP | UDP] [/?]
+```
 
 #### Examples
 
-    netstat.exe
-    
-    netstat.exe udp
-    
-    netstat.exe -S DC01.MGMT.LOCAL tcp
-    
-    netstat.exe -S DC01.MGMT.LOCAL -U MGMT\Administrator -P password
+```powershell
+netstat.exe
+
+netstat.exe udp
+
+netstat.exe -S DC01.MGMT.LOCAL tcp
+
+netstat.exe -S DC01.MGMT.LOCAL -U MGMT\Administrator -P password
+```
 
 ---
 
@@ -254,25 +290,31 @@ The `-v` flag causes the HTML contents of the page to be printed; if omitted, on
 
 #### Usage
 
-    pagegrab.exe [-p http(s)://<proxy>:<proxy_port>] [-m <method>] [-d <URL encoded POST data>] [-h <header_1_name> <header_1_value> [-h <header_2_name> <header_2_value>]] [-c] [-v] <URL> [/?]
-      -c  Display the SSL / TLS certificate
-      -v  Print the HTML contents of the response
+```powershell
+pagegrab.exe [-p http(s)://<proxy>:<proxy_port>] [-m <method>] [-d <URL encoded POST data>] [-h <header_1_name> <header_1_value> [-h <header_2_name> <header_2_value>]] [-c] [-v] <URL> [/?]
+  -c  Display the SSL / TLS certificate
+  -v  Print the HTML contents of the response
+```
 
 #### Examples
 
-    pagegrab.exe https://google.com -h User-Agent "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.114 Safari/537.36 Edg/89.0.774.75"
-    
-    GET https://example.com
-    User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.114 Safari/537.36 Edg/89.0.774.75
-    
-    pagegrab.exe https://example.com -h Referer https://www.google.com -h DNT 1 -h Cache-Control no-cache
-        
-    GET https://example.com
-    Proxy: None
-    Referer: https://www.google.com
-    DNT: 1
-    Cache-Control: no-cache
-    User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.107 Safari/537.36 Edg/92.0.902.67
+```text
+pagegrab.exe https://google.com -h User-Agent "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.114 Safari/537.36 Edg/89.0.774.75"
+
+GET https://example.com
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.114 Safari/537.36 Edg/89.0.774.75
+```
+
+```text
+pagegrab.exe https://example.com -h Referer https://www.google.com -h DNT 1 -h Cache-Control no-cache
+
+GET https://example.com
+Proxy: None
+Referer: https://www.google.com
+DNT: 1
+Cache-Control: no-cache
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.107 Safari/537.36 Edg/92.0.902.67
+```
 
 ---
 
@@ -282,7 +324,9 @@ Read the contents of a file; optionally limit to `X` number of lines from the be
 
 #### Usage
 
-    readfile.exe [+X] [-Y] <path_to_file> [/?]
+```powershell
+readfile.exe [+X] [-Y] <path_to_file> [/?]
+```
 
 ---
 
@@ -294,7 +338,9 @@ Lists processes, their PIDs, and their associated services (if applicable)
 
 #### Usage
 
-    tasklist_svc.exe [/?]
+```powershell
+tasklist_svc.exe [/?]
+```
 
 ---
 
@@ -312,17 +358,21 @@ Verbose mode (`/V`) will return the user name under which the process is running
 
 #### Usage
 
-    tasklist_wmi.exe [/S <system> [/U [<domain>\]<username> /P <password>]] [ [/PID <processid> | /IM <imagename> | /FI <"WQL where clause">] ] [/V] [/D "<delimiter>"] [/?]
+```powershell
+tasklist_wmi.exe [/S <system> [/U [<domain>\]<username> /P <password>]] [ [/PID <processid> | /IM <imagename> | /FI <"WQL where clause">] ] [/V] [/D "<delimiter>"] [/?]
+```
 
 #### Examples
 
-    tasklist_wmi.exe /v
-    
-    tasklist_wmi.exe /S 192.168.20.10 /FI "Name Like 'cmd%'"
-    
-    tasklist_wmi.exe /S 192.168.20.10 /FI "CommandLine Like '%svchost%'"
-    
-    tasklist_wmi.exe /S 192.168.20.10 /U Desktop-624L8K3\Administrator /P password /FI "CommandLine Like '%svchost%'"
+```powershell
+tasklist_wmi.exe /v
+
+tasklist_wmi.exe /S 192.168.20.10 /FI "Name Like 'cmd%'"
+
+tasklist_wmi.exe /S 192.168.20.10 /FI "CommandLine Like '%svchost%'"
+
+tasklist_wmi.exe /S 192.168.20.10 /U Desktop-624L8K3\Administrator /P password /FI "CommandLine Like '%svchost%'"
+```
 
 ---
 
@@ -335,17 +385,21 @@ Kills one or more processes by PID or imagename; multiple PIDs should be provide
 
 #### Usage
 
-    taskkill.exe [/S <system> [/U [<domain>\]<username> /P <password>]] { [/PID <processid> | /IM <imagename>] } [/?]
+```powershell
+taskkill.exe [/S <system> [/U [<domain>\]<username> /P <password>]] { [/PID <processid> | /IM <imagename>] } [/?]
+```
 
 #### Examples
 
-    taskkill.exe /PID 964
-    
-    taskkill.exe /PID 340,1432
-    
-    taskkill.exe /IM Calculator.exe
-    
-    taskkill.exe /IM Calculator.exe /S 192.168.2.14
+```powershell
+taskkill.exe /PID 964
+
+taskkill.exe /PID 340,1432
+
+taskkill.exe /IM Calculator.exe
+
+taskkill.exe /IM Calculator.exe /S 192.168.2.14
+```
 
 ---
 
@@ -357,7 +411,9 @@ Authenticates against the specified Active Directory (AD) domain using the provi
 
 #### Usage
 
-    test_ad_creds.exe [/S <server>] <domain> <username> <password> [/?]
+```powershell
+test_ad_creds.exe [/S <server>] <domain> <username> <password> [/?]
+```
 
 ---
 
@@ -369,7 +425,9 @@ Displays a list of visible windows and their associated process.
 
 #### Usage
 
+```powershell
     window_list.exe [/S <host>] [/?]
+```
 
 ---
 
@@ -381,15 +439,19 @@ Runs the specified WMI query and displays properties in key-value pairs. The que
 
 #### Usage
 
-    wmi_query.exe [/S <system> [/U [<domain>\]<username> /P <password>]] [-N <namespace>] [/O <output_filepath>] [/V] "<wmi_query>" [/?]
+```powershell
+wmi_query.exe [/S <system> [/U [<domain>\]<username> /P <password>]] [-N <namespace>] [/O <output_filepath>] [/V] "<wmi_query>" [/?]
+```
 
 #### Examples
 
-    wmi_query.exe "Select * from win32_process"
-    
-    wmi_query.exe -S DC01.MGMT.LOCAL -N root\standardcimv2 "Select * from MSFT_NetTCPConnection"
-    
-    wmi_query.exe -S DC01.MGMT.LOCAL -U MGMT\Administrator -P password -N root\standardcimv2 "Select * from MSFT_NetTCPConnection"
+```powershell
+wmi_query.exe "Select * from win32_process"
+
+wmi_query.exe -S DC01.MGMT.LOCAL -N root\standardcimv2 "Select * from MSFT_NetTCPConnection"
+
+wmi_query.exe -S DC01.MGMT.LOCAL -U MGMT\Administrator -P password -N root\standardcimv2 "Select * from MSFT_NetTCPConnection"
+```
 
 ---
 
@@ -411,3 +473,12 @@ Below is a list of other utilities that I have collected (though not personally 
 - .NET Binary Obfuscator / Packer
   - [ConfuserEx](https://github.com/mkaring/ConfuserEx "ConfuserEx")
   - [neo-ConfuserEx](https://github.com/XenocodeRCE/neo-ConfuserEx "neo-ConfuserEx")
+
+---
+
+## Contributors
+
+Many thanks to my contributors!
+
+- [r00t0v3rr1d3](https://github.com/r00t0v3rr1d3)
+- [CyberThulhu22](https://github.com/CyberThulhu22)

@@ -4,7 +4,8 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
+// using System.Linq;
+using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
@@ -13,79 +14,118 @@ internal class CheckSign
 {
     public static void PrintUsage()
     {
-        Console.WriteLine(@"Check if EXE/DLL is signed. Returns Chain if available.
-        
+        Console.WriteLine(@"Checks whether an EXE/DLL is signed and, if so, validates the signature.
+
 USAGE:
-    check_sig <full_path_to_exe/dll_on_host> [/?]");
+    check_sig [/online] <path_to_exe/dll> [...] [/?]");
     }
-	
+
     private static void Main(string[] args)
     {
         try
         {
-            // Check for Help
-            if (args.Length > 0 && args[0] == "/?")
+            List<string> filepaths = new List<string>();
+            bool onlineCheck = false;
+
+            // Parse arguments
+            for (int i = 0; i < args.Length; i++)
             {
-                //Print Usage
-                PrintUsage();
+                string arg = args[i];
+
+                switch (arg.ToUpper())
+                {
+                    case "-ONLINE":
+                    case "/ONLINE":
+                        // Peform an online revocation list check
+                        onlineCheck = true;
+                        break;
+                    case "/?":
+                        // Print usage and exit
+                        PrintUsage();
+                        return;
+                    default:
+                        filepaths.Add(arg);
+                        break;
+                }
+            }
+
+            // Check whether filepath(s) specified
+            if (filepaths.Count == 0)
+            {
+                Console.Error.WriteLine("[!] [CheckSign] ERROR: No file(s) specified");
                 return;
             }
 
-            // Check for Supplied File Argument
-            if (args == null || args.Length == 0 )
-            {
-                Console.WriteLine("[!] [CheckSign] No File Supplied");
-                return;
-            }
+            // List the number of filepaths parsed
+            Console.WriteLine("[*] [CheckSign] Checking {0} file{1}{2}", filepaths.Count, (filepaths.Count > 1) ? "s" : "", Environment.NewLine);
 
-            // Check if File was supplied
-            string filePath = string.Join(" ", args);
-			Console.WriteLine("[+] [CheckSign] " + filePath);
-            if (!File.Exists(filePath))
-            {
-                Console.WriteLine("[-] [CheckSign] File not found");
-                return;
-            }
+            // Process each file
+            int fileNum = 0;
 
-            // Check for Signature
-            X509Certificate2 theCertificate;
-            try
+            foreach (string filepath in filepaths)
             {
-                X509Certificate theSigner = X509Certificate.CreateFromSignedFile(filePath);
-                theCertificate = new X509Certificate2(theSigner);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("[-] [CheckSign] No digital signature found!");
-                Console.WriteLine("    [*] Message: " + ex.Message);
-                return;
-            }
-            
-            // Signature was Found, Gathering Chain information (if available).
-            // This will not reach out to the internet to verify validity, instead will check the local system.
-            bool chainIsValid = false;
-            var theCertificateChain = new X509Chain();
-            theCertificateChain.ChainPolicy.RevocationFlag = X509RevocationFlag.ExcludeRoot;
-            theCertificateChain.ChainPolicy.RevocationMode = X509RevocationMode.Offline;
-            theCertificateChain.ChainPolicy.UrlRetrievalTimeout = new TimeSpan(0, 1, 0);
-            theCertificateChain.ChainPolicy.VerificationFlags = X509VerificationFlags.NoFlag;
-            chainIsValid = theCertificateChain.Build(theCertificate);
+                Console.WriteLine("[*] [CheckSign] File {0}: {1}", ++fileNum, filepath);
 
-            if (chainIsValid)
-            {
-                Console.WriteLine("[+] [CheckSign] Digital Signature Found!");
-                Console.WriteLine("    [*] Publisher Information : " + theCertificate.SubjectName.Name);
-                Console.WriteLine("    [*] Valid From: " + theCertificate.GetEffectiveDateString());
-                Console.WriteLine("    [*] Valid To: " + theCertificate.GetExpirationDateString());
-                Console.WriteLine("    [*] Issued By: " + theCertificate.Issuer);
-                return;
-            }
-            else
-            {
-                Console.WriteLine("[+] [CheckSign] Digital Signature Found!");
-                Console.WriteLine("    [-] Chain Not Valid or Unable to Verify Chain.");
-                Console.WriteLine("    [-] Certificate is/may be self-signed.");
-                return;
+                if (!File.Exists(filepath))
+                {
+                    Console.WriteLine("    [-] [CheckSign] ERROR: File not found ({0})", filepath);
+                    continue;
+                }
+
+                // Check for Signature
+                X509Certificate2 cert;
+                try
+                {
+                    X509Certificate theSigner = X509Certificate.CreateFromSignedFile(filepath);
+                    cert = new X509Certificate2(theSigner);
+                }
+                catch (CryptographicException)
+                {
+                    Console.WriteLine("    [-] [CheckSign] No digital signature found!\n");
+                    continue;
+                }
+                catch (Exception e)
+                {
+                    Console.Error.WriteLine("    [-] [CheckSign] ERROR: {0}\n", e.Message.Trim());
+                    continue;
+                }
+
+                Console.WriteLine("    [*] Digital signature found");
+
+                // Signature was Found, Gathering Chain information (if available).
+                // This will not reach out to the internet to verify validity, instead will check the local system.
+                bool chainIsValid = false;
+                var certChain = new X509Chain();
+                certChain.ChainPolicy.RevocationFlag = X509RevocationFlag.ExcludeRoot;
+                certChain.ChainPolicy.RevocationMode = (onlineCheck) ? X509RevocationMode.Online : X509RevocationMode.Offline;
+                certChain.ChainPolicy.UrlRetrievalTimeout = new TimeSpan(0, 1, 0);
+                certChain.ChainPolicy.VerificationFlags = X509VerificationFlags.NoFlag;
+                chainIsValid = certChain.Build(cert);
+
+                Console.WriteLine("        Publisher  : " + cert.SubjectName.Name);
+                Console.WriteLine("        Valid From : " + cert.GetEffectiveDateString());
+                Console.WriteLine("        Valid To   : " + cert.GetExpirationDateString());
+                Console.WriteLine("        Issued By  : " + cert.Issuer);
+
+                if (chainIsValid)
+                {
+                    Console.WriteLine("    [+] Signature valid!");
+                }
+                else
+                {
+                    DateTime expirationDate = DateTime.Parse(cert.GetExpirationDateString());
+
+                    if (DateTime.Today > expirationDate)
+                    {
+                        Console.WriteLine("    [-] Signature expired");
+                    }
+                    else
+                    {
+                        Console.WriteLine("    [-] Chain invalid or unable to verify chain; certificate may be self-signed");
+                    }
+                }
+
+                Console.WriteLine();
             }
         }
         catch (Exception e)
