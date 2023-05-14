@@ -299,6 +299,8 @@ netstat.exe -S DC01.MGMT.LOCAL -U MGMT\Administrator -P password
 
 ### pagegrab.exe
 
+**NOTE: This will fail against any HTTPS site that does not support SSL 3.0 or TLS 1.0**; this is due to the ancient .NET versions it targets. For newer TLS versions, use [SharpPageGrab](https://github.com/breakid/SharpPageGrab) instead.
+
 Makes a web request; can be used to check external connectivity or get the content of an internal web page without going through the trouble of setting up a SOCKS proxy.
 
 Can optionally specify the HTTP method, POST request data (if applicable), a proxy server/port, and an arbitrary number of headers.
@@ -307,7 +309,7 @@ Custom headers are supported; however, `Date`, `Host`, and `If-Modified-Since` a
 
 The `Proxy` header will always show in the printed output; however, if the value is `None`, no `Proxy` header was sent as part of the request.
 
-The `-v` flag causes the HTML contents of the page to be printed; if omitted, only the response headers will be shown.
+The `-c` flag displays info about the SSL / TLS certificate. The `-v` flag causes the HTML contents of the page to be printed; if omitted, only the response headers will be shown.
 
 #### Usage
 
